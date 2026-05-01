@@ -1,0 +1,94 @@
+/* ============================================================
+   TICKER
+   ============================================================ */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   SCROLL FADE-IN
+   ============================================================ */
+.fade-in {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in[data-delay="100"] { transition-delay: 0.1s; }
+.fade-in[data-delay="150"] { transition-delay: 0.15s; }
+.fade-in[data-delay="200"] { transition-delay: 0.2s; }
+.fade-in[data-delay="250"] { transition-delay: 0.25s; }
+.fade-in[data-delay="300"] { transition-delay: 0.3s; }
+.fade-in[data-delay="350"] { transition-delay: 0.35s; }
+.fade-in[data-delay="400"] { transition-delay: 0.4s; }
+.fade-in[data-delay="500"] { transition-delay: 0.5s; }
+
+/* ============================================================
+   HERO ENTRANCE
+   ============================================================ */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-eyebrow {
+  animation: hero-fade-up 0.7s ease both;
+}
+
+.hero h1 {
+  animation: hero-fade-up 0.7s ease both;
+  animation-delay: 0.08s;
+}
+
+.hero-sub {
+  animation: hero-fade-up 0.7s ease both;
+  animation-delay: 0.16s;
+}
+
+.hero-cta {
+  animation: hero-fade-up 0.7s ease both;
+  animation-delay: 0.24s;
+}
+
+.dashboard-mockup {
+  animation: hero-fade-up 0.8s ease both;
+  animation-delay: 0.32s;
+}
+
+/* ============================================================
+   STAT NUMBER COUNTER ANIMATION
+   ============================================================ */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stat-number.animate {
+  animation: count-up 0.5s ease both;
+}
+
+/* ============================================================
+   PRICE FLIP
+   ============================================================ */
+@keyframes price-flip {
+  0%   { opacity: 1; transform: translateY(0); }
+  40%  { opacity: 0; transform: translateY(-6px); }
+  60%  { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.price-amount.flipping {
+  animation: price-flip 0.3s ease both;
+}

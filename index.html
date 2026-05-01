@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="RentProof is the property operating system for landlords and property managers. Track rent, automate reminders, document units, manage maintenance, and win deposit disputes.">
+  <title>RentProof -- Property Management That Works</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav id="nav">
+  <a href="/" class="logo">Rent<span class="accent">Proof</span></a>
+
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#tenants">For Tenants</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="/login.html" class="nav-login">Login</a>
+    <a href="/signup.html" class="nav-cta">Start Free Trial</a>
+  </div>
+
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- Mobile overlay -->
+<div class="nav-overlay" id="nav-overlay">
+  <a href="#features">Features</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#tenants">For Tenants</a>
+  <a href="/login.html">Login</a>
+  <a href="/signup.html" class="nav-overlay-cta">Start Free Trial</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+
+      <div class="hero-copy">
+        <div class="hero-eyebrow">Property management, finally solved</div>
+
+        <h1>
+          Every unit tracked.<br>
+          Every payment logged.<br>
+          Every <span class="accent-word">dispute won.</span>
+        </h1>
+
+        <p class="hero-sub">
+          RentProof gives landlords and property managers one dashboard for rent collection, maintenance, documents, and deposit disputes. Stop chasing payments. Stop losing paper trails.
+        </p>
+
+        <div class="hero-cta">
+          <a href="/signup.html" class="btn-primary">Start Free Trial</a>
+          <a href="#how-it-works" class="btn-ghost">See how it works &darr;</a>
+        </div>
+      </div>
+
+      <!-- Dashboard mockup -->
+      <div class="dashboard-mockup">
+        <div class="dash-chrome">
+          <div class="dash-chrome-dot"></div>
+          <div class="dash-chrome-dot"></div>
+          <div class="dash-chrome-dot"></div>
+          <span class="dash-chrome-title">rentproof.app/dashboard</span>
+        </div>
+
+        <div class="dash-header">
+          <div class="dash-title-block">
+            <div class="dash-title">Rent Dashboard</div>
+            <div class="dash-subtitle">April 2026 &mdash; 4 of 6 units collected</div>
+          </div>
+          <div class="dash-progress-wrap">
+            <div class="dash-progress-bar">
+              <div class="dash-progress-fill" style="width: 67%"></div>
+            </div>
+            <div class="dash-progress-label">67% collected</div>
+          </div>
+        </div>
+
+        <div class="dash-table">
+          <div class="dash-row dash-row-header">
+            <span>Unit</span>
+            <span>Tenant</span>
+            <span>Amount</span>
+            <span>Status</span>
+          </div>
+          <div class="dash-row">
+            <span class="dash-unit">1A</span>
+            <span class="dash-tenant">M. Kowalski</span>
+            <span class="dash-amount">$1,800</span>
+            <span class="badge badge-paid">Paid</span>
+          </div>
+          <div class="dash-row">
+            <span class="dash-unit">1B</span>
+            <span class="dash-tenant">T. Okonkwo</span>
+            <span class="dash-amount">$2,100</span>
+            <span class="badge badge-paid">Paid</span>
+          </div>
+          <div class="dash-row">
+            <span class="dash-unit">2A</span>
+            <span class="dash-tenant">R. Nguyen</span>
+            <span class="dash-amount">$1,950</span>
+            <span class="badge badge-pending">Pending</span>
+          </div>
+          <div class="dash-row">
+            <span class="dash-unit">2B</span>
+            <span class="dash-tenant">S. Martinez</span>
+            <span class="dash-amount">$1,650</span>
+            <span class="badge badge-paid">Paid</span>
+          </div>
+          <div class="dash-row">
+            <span class="dash-unit">3A</span>
+            <span class="dash-tenant">J. Patel</span>
+            <span class="dash-amount">$2,400</span>
+            <span class="badge badge-late">3 days late</span>
+          </div>
+          <div class="dash-row">
+            <span class="dash-unit">3B</span>
+            <span class="dash-tenant">C. Williams</span>
+            <span class="dash-amount">$1,900</span>
+            <span class="badge badge-paid">Paid</span>
+          </div>
+        </div>
+
+        <div class="dash-footer">
+          <div class="dash-total-label">Total collected</div>
+          <div class="dash-total-amount">$7,450 <span>of $11,800</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TICKER
+     ============================================================ -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker">
+    <span class="ticker-item">Rent tracking</span>
+    <span class="ticker-item">Timestamped documentation</span>
+    <span class="ticker-item">Maintenance requests</span>
+    <span class="ticker-item">Deposit protection</span>
+    <span class="ticker-item">Dispute evidence export</span>
+    <span class="ticker-item">Tenant portal</span>
+    <span class="ticker-item">Lease storage</span>
+    <span class="ticker-item">Late fee automation</span>
+    <span class="ticker-item">Rent tracking</span>
+    <span class="ticker-item">Timestamped documentation</span>
+    <span class="ticker-item">Maintenance requests</span>
+    <span class="ticker-item">Deposit protection</span>
+    <span class="ticker-item">Dispute evidence export</span>
+    <span class="ticker-item">Tenant portal</span>
+    <span class="ticker-item">Lease storage</span>
+    <span class="ticker-item">Late fee automation</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     PROBLEM
+     ============================================================ -->
+<section class="section problem-section" id="problem">
+  <div class="container">
+    <div class="section-label fade-in">The problem</div>
+
+    <p class="problem-headline fade-in" data-delay="100">
+      Running rentals on spreadsheets and text messages is costing you.
+    </p>
+
+    <div class="pain-cards">
+      <div class="pain-card fade-in" data-delay="100">
+        <div class="pain-card-num">01</div>
+        <p>You don't know who has paid until you manually check every month</p>
+      </div>
+      <div class="pain-card fade-in" data-delay="200">
+        <div class="pain-card-num">02</div>
+        <p>One deposit dispute can cost you $2,000 or more with no documentation to back you up</p>
+      </div>
+      <div class="pain-card fade-in" data-delay="300">
+        <div class="pain-card-num">03</div>
+        <p>Maintenance requests get lost in your texts and emails, and tenants follow up for weeks</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     HOW IT WORKS
+     ============================================================ -->
+<section class="section steps-section" id="how-it-works">
+  <div class="container">
+    <div class="section-label fade-in">How it works</div>
+
+    <h2 class="steps-headline fade-in" data-delay="100">
+      Set up in 10 minutes.<br>Running the same day.
+    </h2>
+
+    <div class="steps-grid">
+
+      <div class="step fade-in" data-delay="100">
+        <div class="step-num">01</div>
+        <div class="step-icon-wrap">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>Add your properties and invite tenants</h3>
+        <p>Set up your units in minutes. Tenants get an invite link and join free -- no friction, no credit card, no friction on their end.</p>
+      </div>
+
+      <div class="step fade-in" data-delay="200">
+        <div class="step-num">02</div>
+        <div class="step-icon-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>Tenants pay, report, and document their unit</h3>
+        <p>Tenants submit rent online, report maintenance issues with photos, and complete a guided move-in photo walkthrough that gets timestamped and locked.</p>
+      </div>
+
+      <div class="step fade-in" data-delay="300">
+        <div class="step-num">03</div>
+        <div class="step-icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <h3>Manage everything from one dashboard</h3>
+        <p>Payments, maintenance, documents, deposits, and tenant communication -- all in one place, all logged. Nothing falls through the cracks.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES GRID
+     ============================================================ -->
+<section class="section features-section" id="features">
+  <div class="container">
+    <div class="section-label fade-in">Features</div>
+
+    <h2 class="features-headline fade-in" data-delay="100">
+      Everything you need to run a professional operation.
+    </h2>
+
+    <div class="features-grid">
+
+      <div class="feature-card fade-in">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="feature-tag">Rent tracking</div>
+        <h3>Payment status at a glance</h3>
+        <p>See every unit's payment status in real time. Paid, late, partial -- all on one screen. No calls, no spreadsheet updates, no guessing.</p>
+      </div>
+
+      <div class="feature-card fade-in" data-delay="100">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 2v4M16 2v4M2 10h20"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/></svg>
+        </div>
+        <div class="feature-tag">Move-in documentation</div>
+        <h3>Timestamped, locked, permanent</h3>
+        <p>Tenants complete a guided photo walkthrough on day one. Every image is timestamped and locked -- it cannot be edited or deleted by anyone.</p>
+      </div>
+
+      <div class="feature-card fade-in" data-delay="150">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="feature-tag">Maintenance management</div>
+        <h3>Submitted, tracked, resolved</h3>
+        <p>Tenants submit maintenance requests with photos directly in the app. You assign, update, and close them. Every action is logged with a timestamp.</p>
+      </div>
+
+      <div class="feature-card fade-in" data-delay="200">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="feature-tag">Deposit vault</div>
+        <h3>Protected from the day they move in</h3>
+        <p>Track deposit amounts and legal return deadlines for every unit. One click generates a complete dispute evidence package if it ever goes to court.</p>
+      </div>
+
+      <div class="feature-card fade-in" data-delay="250">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="feature-tag">Lease and document storage</div>
+        <h3>Every document in one place</h3>
+        <p>Upload leases, notices, addendums, and signed agreements. Both parties always have access. Nothing gets lost in an email thread.</p>
+      </div>
+
+      <div class="feature-card fade-in" data-delay="300">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="feature-tag">In-app messaging</div>
+        <h3>Every conversation on record</h3>
+        <p>Every landlord-tenant exchange is timestamped, logged, and stored. No more lost texts. No more "you never told me." The record speaks for itself.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATS BAR
+     ============================================================ -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-block fade-in">
+        <div class="stat-number">$3.2B</div>
+        <div class="stat-label">in security deposits wrongfully withheld each year in the US</div>
+      </div>
+      <div class="stat-block fade-in" data-delay="150">
+        <div class="stat-number">42%</div>
+        <div class="stat-label">of landlords have faced a payment dispute with a tenant</div>
+      </div>
+      <div class="stat-block fade-in" data-delay="300">
+        <div class="stat-number">6x</div>
+        <div class="stat-label">faster dispute resolution for RentProof users vs. the average</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TENANT SECTION
+     ============================================================ -->
+<section class="section tenant-section" id="tenants">
+  <div class="container">
+    <div class="section-label fade-in">For tenants</div>
+
+    <div class="tenant-inner">
+
+      <div class="tenant-left fade-in" data-delay="100">
+        <h2 class="tenant-headline">
+          Your tenants get a portal they will actually use.
+        </h2>
+        <p class="tenant-sub">
+          You invite them with a link. They are set up in minutes. No credit card, no download required, no learning curve. They get a clean portal that handles the things they already want to do online.
+        </p>
+        <div class="tenant-note">
+          Tenants always use RentProof free. You invite them -- they are set up in minutes. They never pay.
+        </div>
+      </div>
+
+      <div class="tenant-tiles fade-in" data-delay="200">
+
+        <div class="tenant-tile">
+          <div class="tenant-tile-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+          <h4>Pay rent online</h4>
+          <p>Bank transfer or card. Logged automatically with a timestamp.</p>
+        </div>
+
+        <div class="tenant-tile">
+          <div class="tenant-tile-icon">
+            <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h4>Report issues with photos</h4>
+          <p>Submit maintenance requests directly, with images attached.</p>
+        </div>
+
+        <div class="tenant-tile">
+          <div class="tenant-tile-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <h4>Access their lease</h4>
+          <p>Their signed documents are always one tap away.</p>
+        </div>
+
+        <div class="tenant-tile">
+          <div class="tenant-tile-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><circle cx="8" cy="14" r="2"/><path d="M14 12h4M14 16h4"/></svg>
+          </div>
+          <h4>Move-in walkthrough</h4>
+          <p>Room-by-room photo documentation on their first day. Locked forever.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRICING
+     ============================================================ -->
+<section class="section pricing-section" id="pricing">
+  <div class="container">
+
+    <div class="pricing-header">
+      <div class="section-label fade-in" style="justify-content: center;">Pricing</div>
+      <h2 class="pricing-headline fade-in" data-delay="100">
+        Straightforward pricing.<br>No surprises.
+      </h2>
+      <p class="pricing-sub fade-in" data-delay="150">
+        Start free for 14 days. No credit card required.
+      </p>
+
+      <div class="pricing-toggle-wrap fade-in" data-delay="200">
+        <span class="toggle-label active" id="toggle-monthly">Monthly</span>
+        <span class="toggle-label" id="toggle-annual">Annual</span>
+        <span class="toggle-savings">2 months free</span>
+      </div>
+    </div>
+
+    <div class="pricing-cards">
+
+      <!-- Starter -->
+      <div class="pricing-card fade-in" data-plan="starter" data-delay="100">
+        <div class="pricing-plan-name">Starter</div>
+        <div class="pricing-price">
+          <span class="price-currency">$</span>
+          <span class="price-amount">19</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="pricing-unit-limit">Up to 5 units</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Rent tracking and payment status</li>
+          <li>Automated rent reminders</li>
+          <li>Maintenance request management</li>
+          <li>Move-in photo documentation</li>
+          <li>Lease and document storage</li>
+          <li>Tenant portal (unlimited tenants)</li>
+        </ul>
+        <a href="/signup.html?plan=starter" class="pricing-cta">Start Free Trial</a>
+      </div>
+
+      <!-- Growth -->
+      <div class="pricing-card featured fade-in" data-plan="growth" data-delay="200">
+        <div class="pricing-badge">Most popular</div>
+        <div class="pricing-plan-name">Growth</div>
+        <div class="pricing-price">
+          <span class="price-currency">$</span>
+          <span class="price-amount">59</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="pricing-unit-limit">Up to 25 units</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Everything in Starter</li>
+          <li>Late fee automation</li>
+          <li>Deposit vault and deadline alerts</li>
+          <li>One-click dispute evidence export</li>
+          <li>In-app landlord-tenant messaging</li>
+          <li>Move-out comparison reports</li>
+          <li>Priority support</li>
+          <li>Custom late fee rules</li>
+          <li>Bulk tenant invites</li>
+        </ul>
+        <a href="/signup.html?plan=growth" class="pricing-cta">Start Free Trial</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card fade-in" data-plan="pro" data-delay="300">
+        <div class="pricing-plan-name">Pro</div>
+        <div class="pricing-price">
+          <span class="price-currency">$</span>
+          <span class="price-amount">149</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="pricing-unit-limit">Unlimited units</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Everything in Growth</li>
+          <li>Unlimited units</li>
+          <li>Team access and roles</li>
+          <li>White-label tenant portal</li>
+          <li>API access</li>
+          <li>Maintenance vendor management</li>
+          <li>Portfolio-level reporting</li>
+          <li>Dedicated account manager</li>
+          <li>SLA-backed support</li>
+          <li>Custom onboarding</li>
+        </ul>
+        <a href="/signup.html?plan=pro" class="pricing-cta">Start Free Trial</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS
+     ============================================================ -->
+<section class="section testimonials-section">
+  <div class="container">
+    <div class="section-label fade-in">What landlords say</div>
+
+    <h2 class="testimonials-headline fade-in" data-delay="100">
+      Real landlords. Real situations.
+    </h2>
+
+    <div class="testimonials-grid">
+
+      <div class="testimonial-card fade-in" data-delay="100">
+        <p class="testimonial-quote">
+          "My tenant contested the full deposit after move-out. I had timestamped photos of every room from day one. The case was closed in my favor in under two weeks. Without RentProof, I would have lost $3,000."
+        </p>
+        <div class="testimonial-author">
+          <span class="testimonial-name">David K.</span>
+          <span class="testimonial-role">Landlord -- 4 units -- Indianapolis, IN</span>
+        </div>
+      </div>
+
+      <div class="testimonial-card fade-in" data-delay="200">
+        <p class="testimonial-quote">
+          "I used to spend three days every month tracking who paid and texting late tenants. Now it is fully automated. My tenants get reminded, late fees apply automatically, and I check a dashboard instead of a spreadsheet."
+        </p>
+        <div class="testimonial-author">
+          <span class="testimonial-name">Patricia L.</span>
+          <span class="testimonial-role">Landlord -- 12 units -- Austin, TX</span>
+        </div>
+      </div>
+
+      <div class="testimonial-card fade-in" data-delay="300">
+        <p class="testimonial-quote">
+          "We switched from a legacy PM system that cost $300 a month and did half of what RentProof does. The maintenance tracking alone saved us from two tenant escalations last quarter. This is what the software should have been ten years ago."
+        </p>
+        <div class="testimonial-author">
+          <span class="testimonial-name">Marcus R.</span>
+          <span class="testimonial-role">Property Manager -- 40 units -- Philadelphia, PA</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FINAL CTA
+     ============================================================ -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-headline fade-in">
+      Stop managing rentals<br>like it's 2005.
+    </h2>
+    <p class="cta-sub fade-in" data-delay="100">
+      Set up takes 10 minutes. Your first tenant invite goes out today.
+    </p>
+    <a href="/signup.html" class="cta-btn fade-in" data-delay="200">
+      Start Free Trial -- No credit card required
+    </a>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="footer-logo">Rent<span class="accent">Proof</span></div>
+        <p class="footer-tagline">The property operating system for landlords and property managers.</p>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Product</div>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Roadmap</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">For Tenants</div>
+        <ul class="footer-links">
+          <li><a href="#tenants">How it works</a></li>
+          <li><a href="#">Tenant login</a></li>
+          <li><a href="#">Pay rent</a></li>
+          <li><a href="#">Tenant support</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">2026 RentProof Inc. Built for landlords, loved by tenants.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+
+    <div id="modal-form-wrap">
+      <div class="modal-eyebrow">Free 14-day trial</div>
+      <h2 id="modal-title">Start with RentProof</h2>
+      <p class="modal-sub">No credit card. No commitment. Cancel any time.</p>
+
+      <form class="modal-form" id="modal-form" novalidate>
+        <input
+          type="email"
+          class="modal-input"
+          id="modal-email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          required
+        >
+
+        <div class="modal-plan-select" role="radiogroup" aria-label="Choose a plan">
+          <label class="plan-option" data-value="starter">
+            <input type="radio" name="plan" value="starter"> Starter
+          </label>
+          <label class="plan-option selected" data-value="growth">
+            <input type="radio" name="plan" value="growth" checked> Growth
+          </label>
+          <label class="plan-option" data-value="pro">
+            <input type="radio" name="plan" value="pro"> Pro
+          </label>
+        </div>
+
+        <button type="submit" class="modal-submit" id="modal-submit">
+          Start Free Trial
+        </button>
+
+        <p class="modal-note">
+          By signing up you agree to our Terms of Service and Privacy Policy.
+        </p>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modal-success">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>You're in.</h3>
+      <p>Check your inbox -- we're sending your account setup link now. You'll be up and running in under 10 minutes.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="js/main.js" defer></script>
+<script src="js/animations.js" defer></script>
+<script src="js/pricing.js" defer></script>
+<script type="module" src="js/firebase.js"></script>
+
+</body>
+</html>

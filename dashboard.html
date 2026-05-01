@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard -- RentProof</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <!-- Hide page until auth check completes to prevent flash -->
+  <style>
+    body { visibility: hidden; }
+  </style>
+</head>
+<body>
+
+<div class="dash-page">
+
+  <!-- ── Top nav ── -->
+  <nav class="dash-nav">
+    <a href="/dashboard.html" class="dash-nav-logo">Rent<span class="accent">Proof</span></a>
+
+    <div class="dash-nav-right">
+      <div class="dash-user-info">
+        <div class="dash-avatar" data-user-avatar></div>
+        <span class="dash-user-name" data-user-name></span>
+      </div>
+      <button class="dash-signout" id="signout-btn">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- ── Main content ── -->
+  <main class="dash-main">
+
+    <!-- Welcome -->
+    <div class="dash-welcome">
+      <div class="dash-welcome-eyebrow">Dashboard</div>
+      <h1 id="welcome-name">Welcome back.</h1>
+      <p class="dash-welcome-sub">Here is what is happening across your portfolio right now.</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="dash-stats">
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Units</div>
+        <div class="dash-stat-value">0</div>
+        <div class="dash-stat-sub">No units added yet</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Rent collected</div>
+        <div class="dash-stat-value green">$0</div>
+        <div class="dash-stat-sub">This month</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Payments late</div>
+        <div class="dash-stat-value accent">0</div>
+        <div class="dash-stat-sub">Outstanding</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-label">Open maintenance</div>
+        <div class="dash-stat-value">0</div>
+        <div class="dash-stat-sub">Requests pending</div>
+      </div>
+    </div>
+
+    <!-- Setup checklist -->
+    <div class="dash-setup">
+      <div class="dash-setup-title">Get your portfolio running</div>
+      <p class="dash-setup-sub">Three steps to go live. Takes about 10 minutes.</p>
+
+      <div class="setup-steps">
+
+        <div class="setup-step">
+          <div class="setup-step-num">1</div>
+          <div class="setup-step-body">
+            <h4>Add your first property</h4>
+            <p>Enter the address and unit details. You can add multiple units under one property.</p>
+            <button class="setup-step-action">Add property &rarr;</button>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">2</div>
+          <div class="setup-step-body">
+            <h4>Invite your tenants</h4>
+            <p>Send each tenant an invite link. They join free and are set up in minutes.</p>
+            <button class="setup-step-action">Send invites &rarr;</button>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">3</div>
+          <div class="setup-step-body">
+            <h4>Upload your leases</h4>
+            <p>Store signed leases and documents. Both parties always have access.</p>
+            <button class="setup-step-action">Upload documents &rarr;</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
