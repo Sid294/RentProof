@@ -19,3 +19,9 @@ next-env.d.ts
 
 # OS
 .DS_Store
+
+# email
+backend/email_secrets.py
+
+# Firebase config with exposed API keys
+js/firebase.js

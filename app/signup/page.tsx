@@ -46,10 +46,39 @@ export default function SignupPage() {
     clearError()
     setGoogleLoading(true)
     try {
-      await signInWithPopup(auth, provider)
+      console.log("Starting Google sign-in...");
+      const result = await signInWithPopup(auth, provider)
+      const user = result.user
+      console.log("Google sign-in successful:", user.email);
+      
+      // Notify backend about the new user so it can send welcome email
+      try {
+        console.log("Calling backend signup for Google user...");
+        const res = await fetch('http://localhost:8000/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: user.email,
+            password: 'google-oauth', // placeholder since it's OAuth
+            name: user.displayName || user.email?.split('@')[0] || 'User',
+            plan: 'growth',
+          }),
+        })
+        console.log("Backend response:", res.status);
+        if (!res.ok) {
+          console.warn('Backend signup warning:', await res.json())
+          // Don't block signup if backend fails
+        }
+      } catch (err) {
+        console.warn('Could not contact backend for Google signup:', err)
+        // Don't block signup if backend fails
+      }
+      
+      console.log("Redirecting to dashboard...");
       router.replace('/dashboard')
     } catch (err: unknown) {
       setGoogleLoading(false)
+      console.error("Google sign-in error:", err);
       const code = (err as { code?: string }).code ?? ''
       setError(FRIENDLY_ERRORS[code] ?? 'Something went wrong. Please try again.')
     }
@@ -57,6 +86,7 @@ export default function SignupPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    console.log("handleSubmit called");
     clearError()
     if (!name)              { setError('Enter your full name.');              return }
     if (!email)             { setError('Enter your email address.');          return }
@@ -64,12 +94,46 @@ export default function SignupPage() {
     if (password.length < 6){ setError('Password must be at least 6 characters.'); return }
 
     setLoading(true)
+    console.log("Form validation passed, starting signup...");
     try {
+      console.log("Starting signup...");
       const cred = await createUserWithEmailAndPassword(auth, email, password)
+      console.log("Firebase user created:", cred.user.email);
+      
       await updateProfile(cred.user, { displayName: name })
+      console.log("Profile updated");
+      
+      // Notify FastAPI backend about the new signup so it can run server-side
+      // tasks (eg. send welcome email). FastAPI should be running on port 8000.
+      try {
+        console.log("Calling backend signup...");
+        const res = await fetch('http://localhost:8000/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name, plan: 'growth' }),
+        })
+        console.log("Backend response:", res.status, res.statusText);
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ detail: 'Signup proxy failed' }))
+          console.error("Backend error:", err);
+          setLoading(false)
+          setError(err.detail || err.error || 'Server signup failed')
+          return
+        }
+        console.log("Backend signup successful");
+      } catch (err) {
+        console.error("Backend fetch error:", err);
+        setLoading(false)
+        setError('Could not contact backend server. Please try again.')
+        return
+      }
+
+      console.log("Redirecting to dashboard...");
       router.replace('/dashboard')
     } catch (err: unknown) {
       setLoading(false)
+      console.error("Signup error:", err);
       const code = (err as { code?: string }).code ?? ''
       setError(FRIENDLY_ERRORS[code] ?? 'Something went wrong. Please try again.')
     }

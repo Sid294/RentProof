@@ -4,7 +4,12 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
+import {
+  onAuthStateChanged,
+  signOut,
+  type User,
+  deleteUser,
+} from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 const SETUP_STEPS = [
@@ -47,6 +52,57 @@ export default function DashboardPage() {
     router.replace('/login')
   }
 
+  async function handleDeleteAccount() {
+    const ok = confirm(
+      'Are you sure you want to permanently delete your account? This cannot be undone.'
+    )
+    if (!ok) return
+
+    const u = auth.currentUser
+    if (!u) {
+      alert('No user is signed in.')
+      return
+    }
+
+    try {
+      console.log("Starting account deletion for:", u.email);
+      
+      // Notify backend to remove user data before deleting from Firebase
+      try {
+        console.log("Calling backend delete...");
+        const res = await fetch('http://localhost:8000/api/auth/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: u.email }),
+        })
+        console.log("Backend delete response:", res.status);
+        if (!res.ok) {
+          console.warn('Backend cleanup failed:', await res.json())
+        }
+      } catch (err) {
+        console.warn('Could not reach backend for cleanup:', err)
+      }
+
+      console.log("Deleting from Firebase...");
+      await deleteUser(u)
+      console.log("✓ User deleted from Firebase");
+      
+      // After deletion, redirect to signup page
+      router.replace('/signup')
+    } catch (err: any) {
+      console.error("Delete account error:", err);
+      
+      // If deletion requires recent login, prompt user to re-authenticate
+      if (err?.code === 'auth/requires-recent-login') {
+        alert('Please sign out and sign in again to confirm account deletion.')
+        await signOut(auth)
+        router.replace('/login')
+        return
+      }
+      alert('Failed to delete account: ' + (err?.message || err))
+    }
+  }
+
   if (loading) {
     return (
       <div style={{
@@ -87,6 +143,7 @@ export default function DashboardPage() {
             <span className="dash-user-name">{displayName}</span>
           </div>
           <button className="dash-signout" onClick={handleSignOut}>Sign out</button>
+          <button className="dash-delete" onClick={handleDeleteAccount}>Delete account</button>
         </div>
       </nav>
 
