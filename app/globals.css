@@ -2247,6 +2247,25 @@ footer {
   color: var(--paper);
 }
 
+.dash-delete {
+  font-size: 0.7rem;
+  color: var(--mid);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s, color 0.2s;
+  margin-left: 0.5rem;
+}
+
+.dash-delete:hover {
+  border-color: var(--mid);
+  color: var(--paper);
+}
+
 /* Dashboard main */
 .dash-main {
   flex: 1;

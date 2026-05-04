@@ -10,12 +10,12 @@ import { getAuth, onAuthStateChanged, signOut }
                                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const firebaseConfig = {
-  apiKey:            'YOUR_API_KEY',
-  authDomain:        'YOUR_PROJECT_ID.firebaseapp.com',
-  projectId:         'YOUR_PROJECT_ID',
-  storageBucket:     'YOUR_PROJECT_ID.appspot.com',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId:             'YOUR_APP_ID',
+  apiKey:            'AIzaSyAr3P9nn0gBmFegU-SVBqSv2tqx68f6ALQ',
+  authDomain:        'rentroof-bcfaf.firebaseapp.com',
+  projectId:         'rentroof-bcfaf',
+  storageBucket:     'rentroof-bcfaf.firebasestorage.app',
+  messagingSenderId: '62296156879',
+  appId:             '1:62296156879:web:54ba1c9c6e96df09fe25ba',
 };
 
 const app  = initializeApp(firebaseConfig);

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from models import Feature, PricingPlan, Testimonial, Stat
+from backend.models import Feature, PricingPlan, Testimonial, Stat
 from typing import List
 
 router = APIRouter()

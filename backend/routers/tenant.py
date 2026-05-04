@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from models import (
+from backend.models import (
     TenantPortal, PaymentRequest, PaymentResponse, Payment,
     TenantMaintenanceRequest, MoveInWalkthrough, WalkthroughRoom,
     WalkthroughSubmitRequest, WalkthroughSubmitResponse, Certificate

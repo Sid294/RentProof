@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from models import (
+from backend.models import (
     Property, PropertyCreateRequest, RentStatus, RentStatusUnit,
     MaintenanceRequest, MaintenanceCreateRequest, Deposit, DepositCreateRequest
 )
