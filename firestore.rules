@@ -1,14 +1,73 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    /* ── Landing page waitlist signups ── */
     match /signups/{docId} {
-      allow read:  if false;
+      allow read:   if false;
       allow create: if request.resource.data.email is string
                     && request.resource.data.email.size() > 4
                     && request.resource.data.email.matches('.*@.*\\..*')
                     && request.resource.data.plan in ['starter', 'growth', 'pro']
                     && request.resource.data.source == 'landing';
     }
+
+    /* ── Properties (landlord-owned) ── */
+    match /properties/{propId} {
+      allow read, update, delete: if request.auth != null
+        && request.auth.uid == resource.data.landlordUid;
+      allow create: if request.auth != null
+        && request.resource.data.landlordUid == request.auth.uid;
+    }
+
+    /* ── Units ── */
+    match /units/{unitId} {
+      /* Landlord has full access */
+      allow read, update, delete: if request.auth != null
+        && request.auth.uid == resource.data.landlordUid;
+      allow create: if request.auth != null
+        && request.resource.data.landlordUid == request.auth.uid;
+
+      /* Tenant can read their own linked unit */
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.tenantUid;
+
+      /* Tenant can claim an unclaimed unit (invite acceptance).
+         Only tenantUid, tenantName, tenantEmail may be set. */
+      allow update: if request.auth != null
+        && resource.data.tenantUid == null
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['tenantUid', 'tenantName', 'tenantEmail'])
+        && request.resource.data.tenantUid == request.auth.uid;
+    }
+
+    /* ── Payments ── */
+    match /payments/{paymentId} {
+      allow read, update, delete: if request.auth != null
+        && request.auth.uid == resource.data.landlordUid;
+      allow create: if request.auth != null
+        && request.resource.data.landlordUid == request.auth.uid;
+    }
+
+    /* ── Invites ── */
+    match /invites/{token} {
+      /* Anyone with the token can read (token acts as the secret) */
+      allow read: if true;
+
+      /* Only the landlord can create an invite */
+      allow create: if request.auth != null
+        && request.resource.data.landlordUid == request.auth.uid;
+
+      /* Tenant can mark the invite as used (accept it).
+         Only usedAt and tenantUid may be written. */
+      allow update: if request.auth != null
+        && resource.data.usedAt == null
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['usedAt', 'tenantUid'])
+        && request.resource.data.tenantUid == request.auth.uid;
+    }
+
+    /* Deny all other access */
     match /{document=**} {
       allow read, write: if false;
     }

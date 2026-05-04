@@ -13,10 +13,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/auth.css">
 
-  <!-- Hide page until auth check completes to prevent flash -->
-  <style>
-    body { visibility: hidden; }
-  </style>
+  <style>body { visibility: hidden; }</style>
 </head>
 <body>
 
@@ -49,17 +46,17 @@
     <div class="dash-stats">
       <div class="dash-stat-card">
         <div class="dash-stat-label">Units</div>
-        <div class="dash-stat-value">0</div>
-        <div class="dash-stat-sub">No units added yet</div>
+        <div class="dash-stat-value" id="stat-units">0</div>
+        <div class="dash-stat-sub" id="stat-units-sub">No units added yet</div>
       </div>
       <div class="dash-stat-card">
-        <div class="dash-stat-label">Rent collected</div>
-        <div class="dash-stat-value green">$0</div>
-        <div class="dash-stat-sub">This month</div>
+        <div class="dash-stat-label">Paid this month</div>
+        <div class="dash-stat-value green" id="stat-paid">0/0</div>
+        <div class="dash-stat-sub" id="stat-paid-sub">Units paid</div>
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Payments late</div>
-        <div class="dash-stat-value accent">0</div>
+        <div class="dash-stat-value accent" id="stat-late">0</div>
         <div class="dash-stat-sub">Outstanding</div>
       </div>
       <div class="dash-stat-card">
@@ -69,46 +66,42 @@
       </div>
     </div>
 
-    <!-- Setup checklist -->
-    <div class="dash-setup">
-      <div class="dash-setup-title">Get your portfolio running</div>
-      <p class="dash-setup-sub">Three steps to go live. Takes about 10 minutes.</p>
-
-      <div class="setup-steps">
-
-        <div class="setup-step">
-          <div class="setup-step-num">1</div>
-          <div class="setup-step-body">
-            <h4>Add your first property</h4>
-            <p>Enter the address and unit details. You can add multiple units under one property.</p>
-            <button class="setup-step-action">Add property &rarr;</button>
-          </div>
-        </div>
-
-        <div class="setup-step">
-          <div class="setup-step-num">2</div>
-          <div class="setup-step-body">
-            <h4>Invite your tenants</h4>
-            <p>Send each tenant an invite link. They join free and are set up in minutes.</p>
-            <button class="setup-step-action">Send invites &rarr;</button>
-          </div>
-        </div>
-
-        <div class="setup-step">
-          <div class="setup-step-num">3</div>
-          <div class="setup-step-body">
-            <h4>Upload your leases</h4>
-            <p>Store signed leases and documents. Both parties always have access.</p>
-            <button class="setup-step-action">Upload documents &rarr;</button>
-          </div>
-        </div>
-
-      </div>
+    <!-- Properties section -->
+    <div class="dash-section-header">
+      <h2 class="dash-section-title">Properties</h2>
+      <button class="btn-add" id="add-property-btn">+ Add property</button>
     </div>
+
+    <div id="properties-list"></div>
 
   </main>
 
 </div>
+
+<!-- ── Add property modal ── -->
+<div class="dash-modal-overlay" id="add-modal-overlay">
+  <div class="dash-modal">
+    <button class="dash-modal-close" id="add-modal-close">&times;</button>
+    <div class="dash-modal-eyebrow">New property</div>
+    <h2>Add a property</h2>
+    <p class="dash-modal-sub">Enter the address and unit count. Invite links are generated for each unit automatically.</p>
+    <form class="dash-modal-form" id="add-property-form">
+      <div class="auth-field">
+        <label class="auth-label">Address</label>
+        <input class="auth-input" id="prop-address" placeholder="123 Main St, City, State" required>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Number of units</label>
+        <input class="auth-input" id="prop-units" type="number" min="1" max="100" placeholder="e.g. 4" required>
+      </div>
+      <p class="dash-modal-error" id="add-modal-error"></p>
+      <button type="submit" class="auth-submit" id="add-property-submit">Add property</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="rp-toast" id="rp-toast"></div>
 
 <script type="module" src="js/dashboard.js"></script>
 </body>
