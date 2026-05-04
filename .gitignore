@@ -22,3 +22,6 @@ next-env.d.ts
 
 # email
 backend/email_secrets.py
+
+# Firebase config with exposed API keys
+js/firebase.js
