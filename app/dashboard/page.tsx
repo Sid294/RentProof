@@ -12,27 +12,6 @@ import {
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
-const SETUP_STEPS = [
-  {
-    num: 1,
-    title: 'Add your first property',
-    body: 'Enter the address and unit details. Add multiple units under one property.',
-    action: 'Add property',
-  },
-  {
-    num: 2,
-    title: 'Invite your tenants',
-    body: 'Send each tenant an invite link. They join free and are set up in minutes.',
-    action: 'Send invites',
-  },
-  {
-    num: 3,
-    title: 'Upload your leases',
-    body: 'Store signed leases and documents. Both parties always have access.',
-    action: 'Upload documents',
-  },
-]
-
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser]       = useState<User | null>(null)
@@ -148,6 +127,13 @@ export default function DashboardPage() {
       </nav>
 
       <main className="dash-main">
+        <div className="dash-nav-buttons">
+          <button className="nav-btn" onClick={() => router.push('/properties')}>📍 Properties</button>
+          <button className="nav-btn" onClick={() => router.push('/maintenance')}>🔧 Maintenance</button>
+          <button className="nav-btn" onClick={() => router.push('/deposits')}>🔒 Deposits</button>
+          <button className="nav-btn" onClick={() => router.push('/tenant/portal')}>👥 Tenants</button>
+        </div>
+
         <div className="dash-welcome">
           <div className="dash-welcome-eyebrow">Dashboard</div>
           <h1>Welcome back, {firstName}.</h1>
@@ -176,16 +162,47 @@ export default function DashboardPage() {
           <p className="dash-setup-sub">Three steps to go live. Takes about 10 minutes.</p>
 
           <div className="setup-steps">
-            {SETUP_STEPS.map(step => (
-              <div className="setup-step" key={step.num}>
-                <div className="setup-step-num">{step.num}</div>
-                <div className="setup-step-body">
-                  <h4>{step.title}</h4>
-                  <p>{step.body}</p>
-                  <button className="setup-step-action">{step.action} &rarr;</button>
-                </div>
+            <div className="setup-step">
+              <div className="setup-step-num">1</div>
+              <div className="setup-step-body">
+                <h4>Add your first property</h4>
+                <p>Enter the address and unit details. Add multiple units under one property.</p>
+                <button 
+                  className="setup-step-action"
+                  onClick={() => router.push('/properties')}
+                >
+                  Add property &rarr;
+                </button>
               </div>
-            ))}
+            </div>
+
+            <div className="setup-step">
+              <div className="setup-step-num">2</div>
+              <div className="setup-step-body">
+                <h4>Invite your tenants</h4>
+                <p>Send each tenant an invite link. They join free and are set up in minutes.</p>
+                <button 
+                  className="setup-step-action"
+                  onClick={() => router.push('/tenant/portal')}
+                >
+                  Send invites &rarr;
+                </button>
+              </div>
+            </div>
+
+            <div className="setup-step">
+              <div className="setup-step-num">3</div>
+              <div className="setup-step-body">
+                <h4>Upload your leases</h4>
+                <p>Store signed leases and documents. Both parties always have access.</p>
+                <button 
+                  className="setup-step-action"
+                  onClick={() => router.push('/properties')}
+                >
+                  Upload documents &rarr;
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </main>

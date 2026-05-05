@@ -63,6 +63,16 @@ export const api = {
       if (!res.ok) throw new Error('Signup failed')
       return res.json()
     },
+
+    delete: async (email: string) => {
+      const res = await fetch(`${API_BASE}/auth/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!res.ok) throw new Error('Delete failed')
+      return res.json()
+    },
   },
 
   // ==================== DASHBOARD ENDPOINTS ====================
