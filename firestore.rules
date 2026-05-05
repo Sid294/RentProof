@@ -12,7 +12,7 @@ service cloud.firestore {
                     && request.resource.data.source == 'landing';
     }
 
-    /* ── Properties (landlord-owned) ── */
+    /* ── Properties ── */
     match /properties/{propId} {
       allow read, update, delete: if request.auth != null
         && request.auth.uid == resource.data.landlordUid;
@@ -22,18 +22,18 @@ service cloud.firestore {
 
     /* ── Units ── */
     match /units/{unitId} {
-      /* Landlord has full access */
+      /* Landlord full access */
       allow read, update, delete: if request.auth != null
         && request.auth.uid == resource.data.landlordUid;
       allow create: if request.auth != null
         && request.resource.data.landlordUid == request.auth.uid;
 
-      /* Tenant can read their own linked unit */
+      /* Tenant reads their own linked unit */
       allow read: if request.auth != null
         && request.auth.uid == resource.data.tenantUid;
 
-      /* Tenant can claim an unclaimed unit (invite acceptance).
-         Only tenantUid, tenantName, tenantEmail may be set. */
+      /* Tenant claims an unclaimed unit via invite.
+         Only tenantUid / tenantName / tenantEmail may be written. */
       allow update: if request.auth != null
         && resource.data.tenantUid == null
         && request.resource.data.diff(resource.data).affectedKeys()
@@ -41,25 +41,30 @@ service cloud.firestore {
         && request.resource.data.tenantUid == request.auth.uid;
     }
 
-    /* ── Payments ── */
+    /* ── Payments (landlord-managed) ── */
     match /payments/{paymentId} {
       allow read, update, delete: if request.auth != null
         && request.auth.uid == resource.data.landlordUid;
       allow create: if request.auth != null
         && request.resource.data.landlordUid == request.auth.uid;
+
+      /* Tenant reads payment records for their own unit */
+      allow read: if request.auth != null
+        && exists(/databases/$(database)/documents/units/$(resource.data.unitId))
+        && get(/databases/$(database)/documents/units/$(resource.data.unitId)).data.tenantUid
+             == request.auth.uid;
     }
 
     /* ── Invites ── */
     match /invites/{token} {
-      /* Anyone with the token can read (token acts as the secret) */
+      /* Token is the secret — anyone who has it can read it */
       allow read: if true;
 
-      /* Only the landlord can create an invite */
       allow create: if request.auth != null
         && request.resource.data.landlordUid == request.auth.uid;
 
-      /* Tenant can mark the invite as used (accept it).
-         Only usedAt and tenantUid may be written. */
+      /* Tenant marks invite as used.
+         Only usedAt / tenantUid may be written. */
       allow update: if request.auth != null
         && resource.data.usedAt == null
         && request.resource.data.diff(resource.data).affectedKeys()
@@ -67,7 +72,27 @@ service cloud.firestore {
         && request.resource.data.tenantUid == request.auth.uid;
     }
 
-    /* Deny all other access */
+    /* ── Maintenance requests ── */
+    match /maintenance_requests/{reqId} {
+      /* Landlord and the submitting tenant can both read */
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.landlordUid ||
+        request.auth.uid == resource.data.tenantUid
+      );
+
+      /* Only the tenant can create; status must start as 'open' */
+      allow create: if request.auth != null
+        && request.resource.data.tenantUid == request.auth.uid
+        && request.resource.data.status == 'open';
+
+      /* Only the landlord can update; only status / updatedAt may change */
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.landlordUid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'updatedAt']);
+    }
+
+    /* Deny everything else */
     match /{document=**} {
       allow read, write: if false;
     }

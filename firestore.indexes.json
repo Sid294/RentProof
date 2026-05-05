@@ -7,6 +7,22 @@
         { "fieldPath": "landlordUid", "order": "ASCENDING" },
         { "fieldPath": "month",       "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "maintenance_requests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "landlordUid", "order": "ASCENDING"  },
+        { "fieldPath": "createdAt",   "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenance_requests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tenantUid", "order": "ASCENDING"  },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tenant Portal -- RentProof</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <style>body { visibility: hidden; }</style>
+</head>
+<body>
+
+<div class="dash-page">
+
+  <!-- ── Top nav ── -->
+  <nav class="dash-nav">
+    <a href="/tenant.html" class="dash-nav-logo">Rent<span class="accent">Proof</span></a>
+    <div class="dash-nav-right">
+      <div class="dash-user-info">
+        <div class="dash-avatar" data-user-avatar></div>
+        <span class="dash-user-name" data-user-name></span>
+      </div>
+      <button class="dash-signout" id="signout-btn">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="dash-main">
+
+    <!-- Welcome -->
+    <div class="dash-welcome">
+      <div class="dash-welcome-eyebrow">Tenant Portal</div>
+      <h1 id="welcome-name">Welcome back.</h1>
+      <p class="dash-welcome-sub">Here is your rental overview.</p>
+    </div>
+
+    <!-- Overview grid: unit card + payment card -->
+    <div class="tenant-overview-grid">
+      <div class="tenant-info-card" id="tenant-unit-card">
+        <div class="tenant-card-loading">Loading&hellip;</div>
+      </div>
+      <div class="tenant-info-card" id="tenant-payment-card">
+        <div class="tenant-card-loading">Loading&hellip;</div>
+      </div>
+    </div>
+
+    <!-- Payment history -->
+    <div class="dash-section-header" style="margin-top:2.5rem">
+      <h2 class="dash-section-title">Payment History</h2>
+    </div>
+    <div id="payment-history">
+      <div style="padding:1.5rem;font-size:0.72rem;color:var(--mid)">Loading&hellip;</div>
+    </div>
+
+    <!-- Maintenance requests -->
+    <div class="dash-section-header" style="margin-top:2.5rem">
+      <h2 class="dash-section-title">Maintenance Requests</h2>
+      <button class="btn-add" id="new-maintenance-btn">+ New request</button>
+    </div>
+    <div id="maintenance-list">
+      <div style="padding:1.5rem;font-size:0.72rem;color:var(--mid)">Loading&hellip;</div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Submit maintenance modal ── -->
+<div class="dash-modal-overlay" id="maint-modal-overlay">
+  <div class="dash-modal">
+    <button class="dash-modal-close" id="maint-modal-close">&times;</button>
+    <div class="dash-modal-eyebrow">New request</div>
+    <h2>Submit a request</h2>
+    <p class="dash-modal-sub">Describe the issue and your landlord will be notified.</p>
+    <form class="dash-modal-form" id="maint-form">
+      <div class="auth-field">
+        <label class="auth-label">Issue title</label>
+        <input class="auth-input" id="maint-title" placeholder="e.g., Leaky faucet in kitchen" required>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Description</label>
+        <textarea class="auth-input" id="maint-desc" rows="3"
+          placeholder="Describe the issue in detail&hellip;"
+          style="resize:vertical;min-height:80px;line-height:1.5" required></textarea>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Priority</label>
+        <select class="auth-input" id="maint-priority">
+          <option value="low">Low &mdash; not urgent</option>
+          <option value="medium" selected>Medium &mdash; affects daily use</option>
+          <option value="high">High &mdash; major issue</option>
+          <option value="emergency">Emergency &mdash; health / safety risk</option>
+        </select>
+      </div>
+      <p class="dash-modal-error" id="maint-error"></p>
+      <button type="submit" class="auth-submit" id="maint-submit">Submit request</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="rp-toast" id="rp-toast"></div>
+
+<script type="module" src="js/tenant.js"></script>
+</body>
+</html>

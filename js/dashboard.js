@@ -2,8 +2,8 @@ import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.0/fir
 import { getAuth, onAuthStateChanged, signOut }
                             from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
-  getFirestore, collection, doc, addDoc, setDoc, getDocs,
-  query, where, serverTimestamp,
+  getFirestore, collection, doc, addDoc, setDoc, updateDoc, getDocs,
+  query, where, orderBy, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -21,9 +21,18 @@ const db   = getFirestore(app);
 
 let currentUser = null;
 
-/* ── Auth guard ── */
-onAuthStateChanged(auth, user => {
+/* ── Auth guard + tenant redirect ── */
+onAuthStateChanged(auth, async user => {
   if (!user) { window.location.replace('/login.html'); return; }
+
+  /* If this user is linked as a tenant, send them to their portal */
+  try {
+    const tenantSnap = await getDocs(
+      query(collection(db, 'units'), where('tenantUid', '==', user.uid))
+    );
+    if (!tenantSnap.empty) { window.location.replace('/tenant.html'); return; }
+  } catch (_) { /* fail open — treat as landlord */ }
+
   currentUser = user;
   initDashboard(user);
 });
@@ -61,16 +70,20 @@ function populateUserInfo(user) {
 /* ── Portfolio load ── */
 async function loadPortfolio(user) {
   const listEl = document.getElementById('properties-list');
-  listEl.innerHTML = '<div style="padding:1.5rem;font-size:0.72rem;color:var(--mid);">Loading...</div>';
+  listEl.innerHTML = '<div style="padding:1.5rem;font-size:0.72rem;color:var(--mid);">Loading…</div>';
 
   try {
-    const [propsSnap, unitsSnap] = await Promise.all([
+    const [propsSnap, unitsSnap, maintSnap] = await Promise.all([
       getDocs(query(collection(db, 'properties'), where('landlordUid', '==', user.uid))),
       getDocs(query(collection(db, 'units'),      where('landlordUid', '==', user.uid))),
+      getDocs(query(collection(db, 'maintenance_requests'),
+        where('landlordUid', '==', user.uid),
+        orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
     ]);
 
     const properties = propsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     const units      = unitsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const requests   = maintSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     const month        = currentMonth();
     const paymentsSnap = await getDocs(
@@ -81,8 +94,9 @@ async function loadPortfolio(user) {
     const payments = {};
     paymentsSnap.docs.forEach(d => { payments[d.data().unitId] = d.data().status; });
 
-    renderStats(units, payments);
+    renderStats(units, payments, requests);
     renderProperties(properties, units, payments, user);
+    renderMaintenance(requests, units, user);
   } catch (err) {
     console.error('Portfolio load failed:', err);
     listEl.innerHTML =
@@ -91,30 +105,50 @@ async function loadPortfolio(user) {
 }
 
 /* ── Stats ── */
-function renderStats(units, payments) {
+function renderStats(units, payments, requests) {
   const total   = units.length;
   const paid    = units.filter(u => payments[u.id] === 'paid').length;
   const late    = units.filter(u => payments[u.id] === 'late').length;
+  const openMaint = requests.filter(r => r.status === 'open' || r.status === 'in_progress').length;
+
+  /* Show dollar amount if any units have rent set */
+  const collected = units
+    .filter(u => payments[u.id] === 'paid' && u.rentAmount)
+    .reduce((sum, u) => sum + Number(u.rentAmount), 0);
+  const hasAmounts = units.some(u => u.rentAmount);
 
   setText('stat-units',     total);
   setText('stat-units-sub', total === 1 ? '1 unit total' : `${total} units total`);
-  setText('stat-paid',      `${paid}/${total}`);
-  setText('stat-paid-sub',  `Units paid · ${monthLabel()}`);
-  setText('stat-late',      late);
+
+  if (hasAmounts && collected > 0) {
+    setText('stat-paid',     `$${formatMoney(collected)}`);
+    setText('stat-paid-sub', `${paid}/${total} paid · ${monthLabel()}`);
+  } else {
+    setText('stat-paid',     `${paid}/${total}`);
+    setText('stat-paid-sub', `Units paid · ${monthLabel()}`);
+  }
+
+  setText('stat-late',         late);
+  setText('stat-maintenance',  openMaint);
+  setText('stat-maint-sub',    openMaint === 1 ? '1 open request' : `${openMaint} open requests`);
 }
 
 async function reloadStats(user) {
   try {
-    const [unitsSnap, paymentsSnap] = await Promise.all([
+    const [unitsSnap, paymentsSnap, maintSnap] = await Promise.all([
       getDocs(query(collection(db, 'units'), where('landlordUid', '==', user.uid))),
       getDocs(query(collection(db, 'payments'),
         where('landlordUid', '==', user.uid),
         where('month', '==', currentMonth()))),
+      getDocs(query(collection(db, 'maintenance_requests'),
+        where('landlordUid', '==', user.uid),
+        orderBy('createdAt', 'desc'))).catch(() => ({ docs: [] })),
     ]);
     const units    = unitsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     const payments = {};
     paymentsSnap.docs.forEach(d => { payments[d.data().unitId] = d.data().status; });
-    renderStats(units, payments);
+    const requests = maintSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderStats(units, payments, requests);
   } catch (err) {
     console.error('Stats reload failed:', err);
   }
@@ -132,8 +166,7 @@ function renderProperties(properties, units, payments, user) {
         <p>Add your first property to get started.<br>Units and invite links are created automatically.</p>
         <button class="btn-add" id="empty-add-btn">+ Add property</button>
       </div>`;
-    document.getElementById('empty-add-btn')
-      ?.addEventListener('click', openAddModal);
+    document.getElementById('empty-add-btn')?.addEventListener('click', openAddModal);
     return;
   }
 
@@ -164,7 +197,6 @@ function buildPropertyCard(prop, units, payments, user) {
     return card;
   }
 
-  /* Column header row */
   const colHead = document.createElement('div');
   colHead.className = 'dash-unit-row dash-unit-row-header';
   colHead.innerHTML = `
@@ -186,27 +218,24 @@ function buildUnitRow(unit, status, user) {
   row.className = 'dash-unit-row';
   row.dataset.unitId = unit.id;
 
-  /* Unit label */
   const labelEl = document.createElement('div');
   labelEl.className = 'unit-label';
   labelEl.textContent = unit.label;
 
-  /* Tenant */
   const tenantEl = document.createElement('div');
   tenantEl.className = 'unit-tenant';
+  const rentStr = unit.rentAmount ? `<span class="unit-rent"> · $${formatMoney(unit.rentAmount)}/mo</span>` : '';
   if (unit.tenantName) {
-    tenantEl.innerHTML = `<span class="unit-tenant-name">${escapeHtml(unit.tenantName)}</span>`;
+    tenantEl.innerHTML = `<span class="unit-tenant-name">${escapeHtml(unit.tenantName)}</span>${rentStr}`;
   } else {
-    tenantEl.textContent = 'No tenant';
+    tenantEl.innerHTML = `<span>No tenant</span>${rentStr}`;
   }
 
-  /* Invite button */
   const inviteBtn = document.createElement('button');
   inviteBtn.className = 'btn-invite';
   inviteBtn.textContent = unit.tenantName ? 'Resend link' : 'Copy invite';
   inviteBtn.addEventListener('click', () => copyInviteLink(unit, inviteBtn));
 
-  /* Payment status select */
   const statusSel = document.createElement('select');
   statusSel.className = `unit-status-select ${status}`;
   ['paid', 'pending', 'late'].forEach(s => {
@@ -240,6 +269,91 @@ function buildUnitRow(unit, status, user) {
   return row;
 }
 
+/* ── Maintenance section (landlord view) ── */
+function renderMaintenance(requests, units, user) {
+  const listEl = document.getElementById('maintenance-list');
+  if (!listEl) return;
+
+  if (requests.length === 0) {
+    listEl.innerHTML = `
+      <div class="dash-empty" style="padding:2rem">
+        <div class="dash-empty-title" style="font-size:0.85rem">No maintenance requests</div>
+        <p style="font-size:0.7rem">Tenant-submitted requests appear here. Update status as you work through them.</p>
+      </div>`;
+    return;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'dash-property-card';
+
+  requests.forEach(req => {
+    const unit = units.find(u => u.id === req.unitId);
+    card.appendChild(buildLandlordMaintenanceRow(req, unit, user));
+  });
+
+  listEl.innerHTML = '';
+  listEl.appendChild(card);
+}
+
+function buildLandlordMaintenanceRow(req, unit, user) {
+  const priorityMeta = {
+    low:       { label: 'Low',       cls: 'priority-low'       },
+    medium:    { label: 'Medium',    cls: 'priority-medium'    },
+    high:      { label: 'High',      cls: 'priority-high'      },
+    emergency: { label: 'Emergency', cls: 'priority-emergency' },
+  };
+  const pm   = priorityMeta[req.priority] || priorityMeta.medium;
+  const date = req.createdAt?.toDate?.()?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || '';
+  const unitInfo = unit ? `${escapeHtml(unit.label)}` : 'Unknown unit';
+
+  const row = document.createElement('div');
+  row.className = 'maint-row';
+
+  const bodyDiv = document.createElement('div');
+  bodyDiv.className = 'maint-row-body';
+  bodyDiv.innerHTML = `
+    <div class="maint-row-title">${escapeHtml(req.title)}</div>
+    <div class="maint-row-submeta">${unitInfo} &middot; ${escapeHtml(req.tenantName || 'Tenant')} &middot; ${date}</div>
+    <div class="maint-row-desc">${escapeHtml(req.description)}</div>`;
+
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'maint-row-meta';
+
+  const prioritySpan = document.createElement('span');
+  prioritySpan.className = `maint-priority ${pm.cls}`;
+  prioritySpan.textContent = pm.label;
+
+  const statusSel = document.createElement('select');
+  statusSel.className = 'unit-status-select maint-status-select';
+  [['open', 'Open'], ['in_progress', 'In Progress'], ['resolved', 'Resolved']].forEach(([val, lbl]) => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = lbl;
+    if (val === req.status) opt.selected = true;
+    statusSel.appendChild(opt);
+  });
+  statusSel.classList.add(req.status === 'resolved' ? 'paid' : 'pending');
+  statusSel.addEventListener('change', async () => {
+    const newStatus = statusSel.value;
+    statusSel.className = `unit-status-select maint-status-select ${newStatus === 'resolved' ? 'paid' : 'pending'}`;
+    try {
+      await updateDoc(doc(db, 'maintenance_requests', req.id), {
+        status:    newStatus,
+        updatedAt: serverTimestamp(),
+      });
+      await reloadStats(user);
+    } catch (err) {
+      console.error('Maint status update failed:', err);
+    }
+  });
+
+  metaDiv.appendChild(prioritySpan);
+  metaDiv.appendChild(statusSel);
+  row.appendChild(bodyDiv);
+  row.appendChild(metaDiv);
+  return row;
+}
+
 /* ── Invite link ── */
 function copyInviteLink(unit, btn) {
   const link = `${window.location.origin}/invite.html?t=${unit.inviteToken}`;
@@ -252,60 +366,53 @@ function copyInviteLink(unit, btn) {
       btn.classList.remove('copied');
     }, 2500);
   }).catch(() => {
-    /* Fallback for browsers that block clipboard without HTTPS */
     prompt('Copy this invite link:', link);
   });
 }
 
 /* ── Add property modal ── */
 function wireAddPropertyModal(user) {
-  document.getElementById('add-property-btn')
-    ?.addEventListener('click', openAddModal);
-  document.getElementById('add-modal-close')
-    ?.addEventListener('click', closeAddModal);
-  document.getElementById('add-modal-overlay')
-    ?.addEventListener('click', e => {
-      if (e.target === document.getElementById('add-modal-overlay')) closeAddModal();
-    });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeAddModal();
+  document.getElementById('add-property-btn')?.addEventListener('click', openAddModal);
+  document.getElementById('add-modal-close')?.addEventListener('click', closeAddModal);
+  document.getElementById('add-modal-overlay')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('add-modal-overlay')) closeAddModal();
   });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAddModal(); });
 
-  document.getElementById('add-property-form')
-    ?.addEventListener('submit', async e => {
-      e.preventDefault();
-      const submitBtn = document.getElementById('add-property-submit');
-      const errEl     = document.getElementById('add-modal-error');
-      const address   = (document.getElementById('prop-address').value || '').trim();
-      const unitCount = parseInt(document.getElementById('prop-units').value, 10);
+  document.getElementById('add-property-form')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const submitBtn  = document.getElementById('add-property-submit');
+    const errEl      = document.getElementById('add-modal-error');
+    const address    = (document.getElementById('prop-address').value || '').trim();
+    const unitCount  = parseInt(document.getElementById('prop-units').value, 10);
+    const rentAmount = parseFloat(document.getElementById('prop-rent').value) || 0;
 
-      errEl.classList.remove('show');
+    errEl.classList.remove('show');
+    if (!address) return;
+    if (!unitCount || unitCount < 1 || unitCount > 100) {
+      errEl.textContent = 'Enter a number of units between 1 and 100.';
+      errEl.classList.add('show');
+      return;
+    }
 
-      if (!address) return;
-      if (!unitCount || unitCount < 1 || unitCount > 100) {
-        errEl.textContent = 'Enter a number between 1 and 100.';
-        errEl.classList.add('show');
-        return;
-      }
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Adding…';
 
-      submitBtn.disabled    = true;
-      submitBtn.textContent = 'Adding…';
-
-      try {
-        await createProperty(user, address, unitCount);
-        closeAddModal();
-        document.getElementById('add-property-form').reset();
-        showToast('Property added.');
-        await loadPortfolio(user);
-      } catch (err) {
-        console.error('Add property failed:', err);
-        errEl.textContent = 'Something went wrong. Try again.';
-        errEl.classList.add('show');
-      } finally {
-        submitBtn.disabled    = false;
-        submitBtn.textContent = 'Add property';
-      }
-    });
+    try {
+      await createProperty(user, address, unitCount, rentAmount);
+      closeAddModal();
+      document.getElementById('add-property-form').reset();
+      showToast('Property added.');
+      await loadPortfolio(user);
+    } catch (err) {
+      console.error('Add property failed:', err);
+      errEl.textContent = 'Something went wrong. Try again.';
+      errEl.classList.add('show');
+    } finally {
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Add property';
+    }
+  });
 }
 
 function openAddModal() {
@@ -319,7 +426,7 @@ function closeAddModal() {
   document.body.style.overflow = '';
 }
 
-async function createProperty(user, address, unitCount) {
+async function createProperty(user, address, unitCount, rentAmount) {
   const propRef = await addDoc(collection(db, 'properties'), {
     landlordUid: user.uid,
     address,
@@ -335,6 +442,7 @@ async function createProperty(user, address, unitCount) {
         propertyId:  propRef.id,
         landlordUid: user.uid,
         label,
+        rentAmount:  rentAmount || null,
         tenantUid:   null,
         tenantName:  null,
         tenantEmail: null,
@@ -373,6 +481,10 @@ function escapeHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function formatMoney(n) {
+  return Number(n).toLocaleString('en-US');
 }
 
 function currentMonth() {

@@ -22,7 +22,6 @@
   <!-- ── Top nav ── -->
   <nav class="dash-nav">
     <a href="/dashboard.html" class="dash-nav-logo">Rent<span class="accent">Proof</span></a>
-
     <div class="dash-nav-right">
       <div class="dash-user-info">
         <div class="dash-avatar" data-user-avatar></div>
@@ -32,7 +31,7 @@
     </div>
   </nav>
 
-  <!-- ── Main content ── -->
+  <!-- ── Main ── -->
   <main class="dash-main">
 
     <!-- Welcome -->
@@ -61,8 +60,8 @@
       </div>
       <div class="dash-stat-card">
         <div class="dash-stat-label">Open maintenance</div>
-        <div class="dash-stat-value">0</div>
-        <div class="dash-stat-sub">Requests pending</div>
+        <div class="dash-stat-value" id="stat-maintenance">0</div>
+        <div class="dash-stat-sub" id="stat-maint-sub">Requests pending</div>
       </div>
     </div>
 
@@ -71,11 +70,15 @@
       <h2 class="dash-section-title">Properties</h2>
       <button class="btn-add" id="add-property-btn">+ Add property</button>
     </div>
-
     <div id="properties-list"></div>
 
-  </main>
+    <!-- Maintenance section -->
+    <div class="dash-section-header" style="margin-top:2.5rem">
+      <h2 class="dash-section-title">Maintenance Requests</h2>
+    </div>
+    <div id="maintenance-list"></div>
 
+  </main>
 </div>
 
 <!-- ── Add property modal ── -->
@@ -84,7 +87,7 @@
     <button class="dash-modal-close" id="add-modal-close">&times;</button>
     <div class="dash-modal-eyebrow">New property</div>
     <h2>Add a property</h2>
-    <p class="dash-modal-sub">Enter the address and unit count. Invite links are generated for each unit automatically.</p>
+    <p class="dash-modal-sub">Enter the address, unit count, and monthly rent. Invite links are generated automatically.</p>
     <form class="dash-modal-form" id="add-property-form">
       <div class="auth-field">
         <label class="auth-label">Address</label>
@@ -93,6 +96,10 @@
       <div class="auth-field">
         <label class="auth-label">Number of units</label>
         <input class="auth-input" id="prop-units" type="number" min="1" max="100" placeholder="e.g. 4" required>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Monthly rent per unit (optional)</label>
+        <input class="auth-input" id="prop-rent" type="number" min="0" step="50" placeholder="e.g. 1200">
       </div>
       <p class="dash-modal-error" id="add-modal-error"></p>
       <button type="submit" class="auth-submit" id="add-property-submit">Add property</button>

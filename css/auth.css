@@ -949,6 +949,215 @@
     grid-template-columns: 4rem 1fr;
     gap: 0.5rem;
   }
-  .btn-invite        { display: none; }
+  .btn-invite         { display: none; }
   .unit-status-select { grid-column: 2; }
+}
+
+/* ============================================================
+   UNIT RENT LABEL
+   ============================================================ */
+.unit-rent {
+  font-size: 0.62rem;
+  color: var(--mid);
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   MAINTENANCE ROWS  (shared by landlord dash + tenant portal)
+   ============================================================ */
+.maint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.maint-row:last-child { border-bottom: none; }
+
+.maint-row-body { flex: 1; min-width: 0; }
+
+.maint-row-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--paper);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.maint-row-submeta {
+  font-size: 0.62rem;
+  color: var(--mid);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.maint-row-desc {
+  font-size: 0.72rem;
+  color: rgba(240, 237, 230, 0.6);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.maint-row-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Priority labels */
+.maint-priority {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 0.15rem 0.45rem;
+  border-radius: 100px;
+}
+
+.priority-low       { color: var(--mid);     background: transparent; border: 1px solid var(--border); }
+.priority-medium    { color: var(--pending);  background: var(--pending-bg); }
+.priority-high      { color: var(--late);     background: var(--late-bg); }
+.priority-emergency { color: #fff;            background: var(--late); }
+
+.maint-date {
+  font-size: 0.6rem;
+  color: var(--mid);
+  letter-spacing: 0.04em;
+}
+
+/* Maintenance status select (narrower than payment select) */
+.maint-status-select {
+  min-width: 7rem;
+  font-size: 0.62rem;
+}
+
+/* ============================================================
+   TENANT PORTAL
+   ============================================================ */
+.tenant-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+
+.tenant-info-card {
+  background: var(--card-bg);
+  padding: 1.75rem 1.5rem;
+  transition: background 0.2s;
+}
+
+.tenant-info-card:hover { background: var(--bg-raised); }
+
+.tenant-card-loading {
+  font-size: 0.72rem;
+  color: var(--mid);
+}
+
+.tenant-card-eyebrow {
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.tenant-card-address {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--paper);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-bottom: 0.3rem;
+}
+
+.tenant-card-unit-label {
+  font-size: 0.72rem;
+  color: var(--mid);
+  margin-bottom: 0.75rem;
+}
+
+.tenant-card-rent {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--paper);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.tenant-card-rent span {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--mid);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.tenant-payment-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.tenant-payment-amount {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--paper);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.tenant-payment-note {
+  font-size: 0.7rem;
+  color: var(--mid);
+  line-height: 1.55;
+  max-width: 260px;
+}
+
+/* Payment history list */
+.payment-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  gap: 1rem;
+}
+
+.payment-history-row:last-child { border-bottom: none; }
+
+.history-month {
+  flex: 1;
+  color: var(--paper);
+}
+
+.history-amount {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--mid);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 640px) {
+  .tenant-overview-grid { grid-template-columns: 1fr; }
+  .maint-row { flex-direction: column; gap: 0.75rem; }
+  .maint-row-meta { flex-direction: row; align-items: center; }
 }
