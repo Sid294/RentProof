@@ -1,0 +1,21 @@
+[
+  {
+    "id": "prop_1778644333.214053",
+    "address": "ff",
+    "city": "ff",
+    "state": "ff",
+    "zipCode": "ff",
+    "units": [
+      {
+        "id": "unit_1778644344.82536",
+        "name": "ff",
+        "tenant": "ff",
+        "rentAmount": 3870.0,
+        "status": "occupied",
+        "dueDate": "31",
+        "paidDate": null,
+        "daysLate": null
+      }
+    ]
+  }
+]

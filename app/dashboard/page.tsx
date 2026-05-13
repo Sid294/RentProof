@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import {
   onAuthStateChanged,
   signOut,
@@ -11,17 +11,77 @@ import {
   deleteUser,
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import api from '@/lib/api'
+
+type DashboardSummary = {
+  units: number
+  rentCollected: string
+  overduePayments: number
+  openMaintenance: number
+}
 
 export default function DashboardPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser]       = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [summary, setSummary] = useState<DashboardSummary>({
+    units: 0,
+    rentCollected: '$0',
+    overduePayments: 0,
+    openMaintenance: 0,
+  })
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, u => {
+    const unsub = onAuthStateChanged(auth, async u => {
       if (!u) { router.replace('/login'); return }
       setUser(u)
-      setLoading(false)
+
+      try {
+        const [properties, rentStatus, maintenance] = await Promise.all([
+          api.dashboard.getProperties(),
+          api.dashboard.getRentStatus(),
+          api.dashboard.getMaintenance(),
+        ])
+
+        const totalUnits = properties.reduce((count: number, property: any) => {
+          return count + (property.units?.length || 0)
+        }, 0)
+
+        const now = new Date()
+        const overduePayments = properties.reduce((count: number, property: any) => {
+          const units = property.units || []
+          const propertyOverdue = units.filter((unit: any) => {
+            if (unit.status === 'paid' || unit.status === 'vacant') return false
+            const dueDay = Number(unit.dueDate)
+            if (!dueDay || Number.isNaN(dueDay)) return false
+
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+            const safeDueDay = Math.min(dueDay, daysInMonth)
+            const dueDate = new Date(now.getFullYear(), now.getMonth(), safeDueDay)
+            const overdueThreshold = new Date(dueDate)
+            overdueThreshold.setDate(overdueThreshold.getDate() + 2)
+
+            return now > overdueThreshold
+          }).length
+
+          return count + propertyOverdue
+        }, 0)
+
+        const rentCollected = rentStatus?.totalRentCollected ?? 0
+        const openMaintenance = maintenance.filter((request: any) => request.status === 'open').length
+
+        setSummary({
+          units: totalUnits,
+          rentCollected: `$${Number(rentCollected).toLocaleString()}`,
+          overduePayments,
+          openMaintenance,
+        })
+      } catch (error) {
+        console.error('Failed to load dashboard summary:', error)
+      } finally {
+        setLoading(false)
+      }
     })
     return unsub
   }, [router])
@@ -127,11 +187,31 @@ export default function DashboardPage() {
       </nav>
 
       <main className="dash-main">
-        <div className="dash-nav-buttons">
-          <button className="nav-btn" onClick={() => router.push('/properties')}>📍 Properties</button>
-          <button className="nav-btn" onClick={() => router.push('/maintenance')}>🔧 Maintenance</button>
-          <button className="nav-btn" onClick={() => router.push('/deposits')}>🔒 Deposits</button>
-          <button className="nav-btn" onClick={() => router.push('/tenant/portal')}>👥 Tenants</button>
+        <div className="dash-nav-buttons dash-nav-buttons--dashboard">
+          <button 
+            className={`nav-btn${pathname === '/properties' ? ' active' : ''}`}
+            onClick={() => router.push('/properties')}
+          >
+            📍 Properties
+          </button>
+          <button 
+            className={`nav-btn${pathname === '/maintenance' ? ' active' : ''}`}
+            onClick={() => router.push('/maintenance')}
+          >
+            🔧 Maintenance
+          </button>
+          <button 
+            className={`nav-btn${pathname === '/deposits' ? ' active' : ''}`}
+            onClick={() => router.push('/deposits')}
+          >
+            🔒 Deposits
+          </button>
+          <button 
+            className={`nav-btn${pathname === '/tenant/portal' ? ' active' : ''}`}
+            onClick={() => router.push('/tenant/portal')}
+          >
+            👥 Tenants
+          </button>
         </div>
 
         <div className="dash-welcome">
@@ -144,10 +224,10 @@ export default function DashboardPage() {
 
         <div className="dash-stats">
           {[
-            { label: 'Units',            value: '0',  cls: '',      sub: 'No units added yet' },
-            { label: 'Rent collected',   value: '$0', cls: 'green', sub: 'This month' },
-            { label: 'Payments late',    value: '0',  cls: 'accent',sub: 'Outstanding' },
-            { label: 'Open maintenance', value: '0',  cls: '',      sub: 'Requests pending' },
+            { label: 'Units',            value: String(summary.units), cls: '',       sub: summary.units === 0 ? 'No units added yet' : 'Active units' },
+            { label: 'Rent collected',   value: summary.rentCollected, cls: 'green',  sub: 'This month' },
+            { label: 'Payments overdue', value: String(summary.overduePayments), cls: 'accent', sub: '2+ days past due date' },
+            { label: 'Open maintenance', value: String(summary.openMaintenance), cls: '', sub: 'Requests pending' },
           ].map(s => (
             <div className="dash-stat-card" key={s.label}>
               <div className="dash-stat-label">{s.label}</div>

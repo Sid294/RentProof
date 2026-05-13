@@ -101,6 +101,14 @@ class PropertyCreateRequest(BaseModel):
     zipCode: Optional[str] = None
 
 
+class UnitCreateRequest(BaseModel):
+    name: str
+    tenant: Optional[str] = ""
+    rentAmount: float
+    status: str = "vacant"
+    dueDate: Optional[int] = None
+
+
 class RentStatusUnit(BaseModel):
     id: str
     unit: str

@@ -15,9 +15,44 @@ service cloud.firestore {
     /* ── Properties ── */
     match /properties/{propId} {
       allow read, update, delete: if request.auth != null
-        && request.auth.uid == resource.data.landlordUid;
+        && (
+          resource.data.userId == request.auth.uid ||
+          resource.data.landlordUid == request.auth.uid
+        );
       allow create: if request.auth != null
-        && request.resource.data.landlordUid == request.auth.uid;
+        && (
+          request.resource.data.userId == request.auth.uid ||
+          request.resource.data.landlordUid == request.auth.uid
+        );
+    }
+
+    /* ── Maintenance ── */
+    match /maintenance/{requestId} {
+      allow read, update, delete: if request.auth != null
+        && (
+          resource.data.userId == request.auth.uid ||
+          resource.data.landlordUid == request.auth.uid
+        );
+      allow create: if request.auth != null
+        && (
+          request.resource.data.userId == request.auth.uid ||
+          request.resource.data.tenantUid == request.auth.uid ||
+          request.resource.data.landlordUid == request.auth.uid
+        );
+    }
+
+    /* ── Deposits ── */
+    match /deposits/{depositId} {
+      allow read, update, delete: if request.auth != null
+        && (
+          resource.data.userId == request.auth.uid ||
+          resource.data.landlordUid == request.auth.uid
+        );
+      allow create: if request.auth != null
+        && (
+          request.resource.data.userId == request.auth.uid ||
+          request.resource.data.landlordUid == request.auth.uid
+        );
     }
 
     /* ── Units ── */

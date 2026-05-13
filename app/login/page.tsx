@@ -93,7 +93,7 @@ export default function LoginPage() {
         </div>
 
         <div className="auth-left-footer">
-          2026 RentProof Inc. Built for landlords, loved by tenants.
+          2026 RentProof Inc. All rights reserved.
         </div>
       </div>
 

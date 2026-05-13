@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import api from '@/lib/api'
+import DashboardHeader from '@/components/layout/DashboardHeader'
 
 interface Deposit {
   id: string
@@ -21,10 +22,11 @@ interface Deposit {
 }
 
 export default function DepositsPage() {
+  const router = useRouter()
+  const pathname = usePathname()
   const [deposits, setDeposits] = useState<Deposit[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async u => {
@@ -55,7 +57,36 @@ export default function DepositsPage() {
   if (error) return <div className="error">Error: {error}</div>
 
   return (
-    <div className="deposits-page">
+    <>
+      <DashboardHeader />
+      <div className="deposits-page">
+        <div className="dash-nav-buttons">
+        <button 
+          className={`nav-btn${pathname === '/properties' ? ' active' : ''}`}
+          onClick={() => router.push('/properties')}
+        >
+          📍 Properties
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/maintenance' ? ' active' : ''}`}
+          onClick={() => router.push('/maintenance')}
+        >
+          🔧 Maintenance
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/deposits' ? ' active' : ''}`}
+          onClick={() => router.push('/deposits')}
+        >
+          🔒 Deposits
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/tenant/portal' ? ' active' : ''}`}
+          onClick={() => router.push('/tenant/portal')}
+        >
+          👥 Tenants
+        </button>
+      </div>
+      
       <div className="page-header">
         <h1>Security Deposits</h1>
         <div className="summary-card">
@@ -133,5 +164,6 @@ export default function DepositsPage() {
         </div>
       )}
     </div>
+    </>
   )
 }

@@ -98,6 +98,29 @@ export const api = {
       return res.json()
     },
 
+    createUnit: async (
+      propertyId: string,
+      name: string,
+      tenant: string,
+      rentAmount: number,
+      status: string = 'vacant',
+      dueDate: string = ''
+    ) => {
+      const res = await fetch(`${API_BASE}/dashboard/properties/${propertyId}/units`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          tenant,
+          rentAmount,
+          status,
+          dueDate: dueDate || null,
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to create unit')
+      return res.json()
+    },
+
     getRentStatus: async () => {
       const res = await fetch(`${API_BASE}/dashboard/rent-status`)
       if (!res.ok) throw new Error('Failed to fetch rent status')

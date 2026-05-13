@@ -556,39 +556,60 @@
 /* Navigation buttons */
 .dash-nav-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: 1px;
   margin-bottom: 2.5rem;
   flex-wrap: wrap;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+  max-width: fit-content;
 }
 
 .nav-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.6rem;
   background: var(--card-bg);
-  color: var(--paper);
+  color: var(--mid);
   font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.07em;
-  padding: 0.9rem 1.5rem;
-  border-radius: 3px;
-  border: 1px solid var(--border);
+  padding: 0.85rem 1.6rem;
+  border: none;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 130px;
+}
+
+.nav-btn:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.nav-btn:last-child {
+  border-radius: 0 3px 3px 0;
 }
 
 .nav-btn:hover {
   background: var(--bg-raised);
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translate(-1px, -1px);
+  color: var(--paper);
+}
+
+.nav-btn.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .nav-btn:active {
-  transform: translate(0, 0);
+  transform: scale(0.98);
 }
 
 /* Setup checklist (for new users) */
@@ -686,6 +707,8 @@
 @media (max-width: 900px) {
   .dash-stats { grid-template-columns: 1fr 1fr; }
   .setup-steps { grid-template-columns: 1fr; }
+  .dash-nav-buttons { width: 100%; }
+  .nav-btn { min-width: auto; flex: 1; }
 }
 
 @media (max-width: 640px) {
@@ -693,6 +716,21 @@
   .dash-main  { padding: 2rem 1.25rem; }
   .dash-nav   { padding: 1rem 1.25rem; }
   .dash-user-name { display: none; }
+  .dash-nav-buttons { 
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    border-radius: 4px;
+  }
+  .nav-btn { 
+    min-width: 100%;
+    flex: 1;
+    border-radius: 0;
+    padding: 0.8rem 1rem;
+    font-size: 0.7rem;
+  }
+  .nav-btn:first-child { border-radius: 4px 4px 0 0; }
+  .nav-btn:last-child { border-radius: 0 0 4px 4px; }
 }
 
 /* ============================================================

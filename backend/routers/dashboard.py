@@ -1,10 +1,13 @@
 from fastapi import APIRouter, HTTPException, status
 from backend.models import (
     Property, PropertyCreateRequest, RentStatus, RentStatusUnit,
-    MaintenanceRequest, MaintenanceCreateRequest, Deposit, DepositCreateRequest
+    MaintenanceRequest, MaintenanceCreateRequest, Deposit, DepositCreateRequest,
+    Unit, UnitCreateRequest
 )
 from typing import List
 from datetime import datetime
+from pathlib import Path
+import json
 
 router = APIRouter()
 
@@ -13,6 +16,51 @@ PROPERTIES_DB = []
 MAINTENANCE_DB = []
 DEPOSITS_DB = []
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+DATA_DIR = BASE_DIR / ".data"
+PROPERTIES_FILE = DATA_DIR / "properties.json"
+
+
+def read_properties() -> list[Property]:
+    try:
+        if not PROPERTIES_FILE.exists():
+            return []
+        with PROPERTIES_FILE.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        def normalize_due_date(value):
+            if value is None:
+                return None
+            if isinstance(value, int):
+                return value
+            if isinstance(value, str):
+                if value.isdigit():
+                    return int(value)
+                try:
+                    return datetime.fromisoformat(value).day
+                except ValueError:
+                    return None
+            return None
+
+        normalized_properties = []
+        for item in data:
+            units = []
+            for unit in item.get("units", []):
+                unit["dueDate"] = normalize_due_date(unit.get("dueDate"))
+                units.append(unit)
+            item["units"] = units
+            normalized_properties.append(Property(**item))
+
+        return normalized_properties
+    except Exception:
+        return []
+
+
+def write_properties(properties: list[Property]) -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with PROPERTIES_FILE.open("w", encoding="utf-8") as file:
+        json.dump([property_item.model_dump() for property_item in properties], file, indent=2)
+
 
 # ==================== Properties ====================
 
@@ -20,40 +68,14 @@ DEPOSITS_DB = []
 async def get_properties():
     """Get all properties for authenticated user"""
     # TODO: Filter by user ID from auth token
-    # Mock data
-    return [
-        Property(
-            id="prop1",
-            address="123 Main St",
-            city="Indianapolis",
-            state="IN",
-            units=[
-                {
-                    "id": "unit1a",
-                    "name": "1A",
-                    "tenant": "M. Kowalski",
-                    "rentAmount": 1800,
-                    "status": "paid",
-                    "dueDate": "2026-04-01",
-                },
-                {
-                    "id": "unit1b",
-                    "name": "1B",
-                    "tenant": "T. Okonkwo",
-                    "rentAmount": 2100,
-                    "status": "paid",
-                    "dueDate": "2026-04-01",
-                },
-            ]
-        )
-    ]
+    return read_properties()
 
 
 @router.post("/properties", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_property(request: PropertyCreateRequest):
     """Create a new property"""
     try:
-        # TODO: Validate and store in database
+        properties = read_properties()
         new_property = Property(
             id=f"prop_{datetime.now().timestamp()}",
             address=request.address,
@@ -62,8 +84,9 @@ async def create_property(request: PropertyCreateRequest):
             zipCode=request.zipCode,
             units=[]
         )
-        
-        PROPERTIES_DB.append(new_property)
+
+        properties.append(new_property)
+        write_properties(properties)
         
         return {
             "success": True,
@@ -76,70 +99,72 @@ async def create_property(request: PropertyCreateRequest):
         )
 
 
+@router.post("/properties/{property_id}/units", response_model=dict, status_code=status.HTTP_201_CREATED)
+async def create_property_unit(property_id: str, request: UnitCreateRequest):
+    """Add a unit to an existing property"""
+    try:
+        properties = read_properties()
+
+        for index, property_item in enumerate(properties):
+            if property_item.id != property_id:
+                continue
+
+            new_unit = Unit(
+                id=f"unit_{datetime.now().timestamp()}",
+                name=request.name,
+                tenant=request.tenant or "",
+                rentAmount=request.rentAmount,
+                status=request.status,
+                dueDate=str(request.dueDate) if request.dueDate is not None else None,
+            )
+
+            updated_property = Property(
+                id=property_item.id,
+                address=property_item.address,
+                city=property_item.city,
+                state=property_item.state,
+                zipCode=property_item.zipCode,
+                units=[*property_item.units, new_unit],
+            )
+
+            properties[index] = updated_property
+            write_properties(properties)
+
+            return {
+                "success": True,
+                "property": updated_property.model_dump(),
+                "unit": new_unit.model_dump(),
+            }
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Property not found"
+        )
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create unit"
+        )
+
+
 # ==================== Rent Status ====================
 
 @router.get("/rent-status", response_model=RentStatus)
 async def get_rent_status():
     """Get current rent collection status"""
     # TODO: Fetch from database filtered by user properties
+    from datetime import datetime as dt
+    current_month = dt.now().strftime("%B %Y")
     return RentStatus(
-        month="April 2026",
-        totalUnits=6,
-        collectedUnits=4,
-        percentageCollected=67,
-        totalRentExpected=11800,
-        totalRentCollected=7450,
-        units=[
-            RentStatusUnit(
-                id="unit1a",
-                unit="1A",
-                tenant="M. Kowalski",
-                amount=1800,
-                status="paid",
-                paidDate="2026-03-31",
-            ),
-            RentStatusUnit(
-                id="unit1b",
-                unit="1B",
-                tenant="T. Okonkwo",
-                amount=2100,
-                status="paid",
-                paidDate="2026-04-01",
-            ),
-            RentStatusUnit(
-                id="unit2a",
-                unit="2A",
-                tenant="R. Nguyen",
-                amount=1950,
-                status="pending",
-                dueDate="2026-04-01",
-            ),
-            RentStatusUnit(
-                id="unit2b",
-                unit="2B",
-                tenant="S. Martinez",
-                amount=1650,
-                status="paid",
-                paidDate="2026-04-02",
-            ),
-            RentStatusUnit(
-                id="unit3a",
-                unit="3A",
-                tenant="J. Patel",
-                amount=2400,
-                status="late",
-                daysLate=3,
-                dueDate="2026-03-30",
-            ),
-            RentStatusUnit(
-                id="unit3b",
-                unit="3B",
-                tenant="C. Williams",
-                amount=1900,
-                status="paid",
-                paidDate="2026-03-31",
-            ),
-        ]
+        month=current_month,
+        totalUnits=0,
+        collectedUnits=0,
+        percentageCollected=0,
+        totalRentExpected=0,
+        totalRentCollected=0,
+        units=[]
     )
 
 
@@ -149,41 +174,8 @@ async def get_rent_status():
 async def get_maintenance():
     """Get all maintenance requests"""
     # TODO: Fetch from database filtered by user
-    return [
-        MaintenanceRequest(
-            id="maint1",
-            unit="2A",
-            tenant="R. Nguyen",
-            title="Leaky faucet in kitchen",
-            description="Kitchen sink is leaking underneath the cabinet",
-            status="open",
-            priority="medium",
-            submittedDate="2026-04-15",
-            images=["image1.jpg", "image2.jpg"],
-        ),
-        MaintenanceRequest(
-            id="maint2",
-            unit="3A",
-            tenant="J. Patel",
-            title="HVAC not working",
-            description="Air conditioning is not turning on",
-            status="in-progress",
-            priority="high",
-            submittedDate="2026-04-10",
-            assignedTo="John Smith",
-        ),
-        MaintenanceRequest(
-            id="maint3",
-            unit="1B",
-            tenant="T. Okonkwo",
-            title="Door lock needs repair",
-            description="Front door lock is sticking",
-            status="completed",
-            priority="low",
-            submittedDate="2026-04-05",
-            completedDate="2026-04-12",
-        ),
-    ]
+    # Start with empty list - tenants submit maintenance requests
+    return []
 
 
 @router.post("/maintenance", response_model=dict, status_code=status.HTTP_201_CREATED)
@@ -229,39 +221,8 @@ async def create_maintenance(request: MaintenanceCreateRequest):
 async def get_deposits():
     """Get all deposit records"""
     # TODO: Fetch from database filtered by user
-    return [
-        Deposit(
-            id="dep1",
-            unit="1A",
-            tenant="M. Kowalski",
-            amount=1800,
-            dateReceived="2025-12-15",
-            moveInDate="2025-12-15",
-            status="held",
-        ),
-        Deposit(
-            id="dep2",
-            unit="1B",
-            tenant="T. Okonkwo",
-            amount=2100,
-            dateReceived="2025-11-01",
-            moveInDate="2025-11-01",
-            moveOutDate="2026-02-28",
-            status="returned",
-            returnDeadline="2026-03-30",
-            returnedDate="2026-03-25",
-            returnAmount=2100,
-        ),
-        Deposit(
-            id="dep3",
-            unit="2A",
-            tenant="R. Nguyen",
-            amount=1950,
-            dateReceived="2026-01-10",
-            moveInDate="2026-01-10",
-            status="held",
-        ),
-    ]
+    # Start with empty list - landlord records deposits
+    return []
 
 
 @router.post("/deposits", response_model=dict, status_code=status.HTTP_201_CREATED)

@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import api from '@/lib/api'
+import DashboardHeader from '@/components/layout/DashboardHeader'
 
 interface TenantPortalData {
   tenant: {
@@ -39,10 +40,11 @@ interface TenantPortalData {
 }
 
 export default function TenantPortalPage() {
+  const router = useRouter()
+  const pathname = usePathname()
   const [data, setData] = useState<TenantPortalData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async u => {
@@ -66,7 +68,15 @@ export default function TenantPortalPage() {
 
   if (loading) return <div className="loading">Loading tenant portal...</div>
   if (error) return <div className="error">Error: {error}</div>
-  if (!data) return <div className="error">No portal data available</div>
+  if (!data || !data.tenant) {
+    return (
+      <div className="tenant-portal">
+        <div className="empty-state">
+          <p>No tenant portal set up yet. Please contact your landlord to set up your account.</p>
+        </div>
+      </div>
+    )
+  }
 
   const getDaysUntilDue = () => {
     const due = new Date(data.currentRent.dueDate)
@@ -82,7 +92,36 @@ export default function TenantPortalPage() {
   }
 
   return (
-    <div className="tenant-portal">
+    <>
+      <DashboardHeader />
+      <div className="tenant-portal">
+        <div className="dash-nav-buttons">
+        <button 
+          className={`nav-btn${pathname === '/properties' ? ' active' : ''}`}
+          onClick={() => router.push('/properties')}
+        >
+          📍 Properties
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/maintenance' ? ' active' : ''}`}
+          onClick={() => router.push('/maintenance')}
+        >
+          🔧 Maintenance
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/deposits' ? ' active' : ''}`}
+          onClick={() => router.push('/deposits')}
+        >
+          🔒 Deposits
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/tenant/portal' ? ' active' : ''}`}
+          onClick={() => router.push('/tenant/portal')}
+        >
+          👥 Tenants
+        </button>
+      </div>
+      
       <div className="portal-header">
         <h1>Welcome, {data.tenant.name}</h1>
         <p className="property-location">{data.property.address}</p>
@@ -192,5 +231,6 @@ export default function TenantPortalPage() {
         </button>
       </div>
     </div>
+    </>
   )
 }

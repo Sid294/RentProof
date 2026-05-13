@@ -1,38 +1,41 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { promises as fs } from 'fs'
+import path from 'path'
+
+const DATA_DIR = path.join(process.cwd(), '.data')
+const PROPERTIES_FILE = path.join(DATA_DIR, 'properties.json')
+
+type StoredProperty = {
+  id: string
+  address: string
+  city: string
+  state: string
+  zipCode?: string
+  units: any[]
+}
+
+async function readProperties(): Promise<StoredProperty[]> {
+  try {
+    const raw = await fs.readFile(PROPERTIES_FILE, 'utf8')
+    return JSON.parse(raw) as StoredProperty[]
+  } catch {
+    return []
+  }
+}
+
+async function writeProperties(properties: StoredProperty[]) {
+  await fs.mkdir(DATA_DIR, { recursive: true })
+  await fs.writeFile(PROPERTIES_FILE, JSON.stringify(properties, null, 2), 'utf8')
+}
 
 export async function GET(request: NextRequest) {
   // TODO: Verify user authentication
   // TODO: Fetch from database filtered by user ID
 
-  const mockProperties = [
-    {
-      id: 'prop1',
-      address: '123 Main St',
-      city: 'Indianapolis',
-      state: 'IN',
-      units: [
-        {
-          id: 'unit1a',
-          name: '1A',
-          tenant: 'M. Kowalski',
-          rentAmount: 1800,
-          status: 'paid',
-          dueDate: '2026-04-01',
-        },
-        {
-          id: 'unit1b',
-          name: '1B',
-          tenant: 'T. Okonkwo',
-          rentAmount: 2100,
-          status: 'paid',
-          dueDate: '2026-04-01',
-        },
-      ],
-    },
-  ]
+  const properties = await readProperties()
 
-  return NextResponse.json(mockProperties)
+  return NextResponse.json(properties)
 }
 
 export async function POST(request: NextRequest) {
@@ -47,19 +50,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TODO: Create property in database
+    const properties = await readProperties()
+    const newProperty: StoredProperty = {
+      id: `prop_${Date.now()}`,
+      address,
+      city,
+      state,
+      zipCode,
+      units: [],
+    }
+
+    properties.push(newProperty)
+    await writeProperties(properties)
 
     return NextResponse.json(
       {
         success: true,
-        property: {
-          id: 'new_prop_id',
-          address,
-          city,
-          state,
-          zipCode,
-          units: [],
-        },
+        property: newProperty,
       },
       { status: 201 }
     )

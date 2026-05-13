@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import api from '@/lib/api'
+import DashboardHeader from '@/components/layout/DashboardHeader'
 
 interface MaintenanceRequest {
   id: string
@@ -20,11 +21,12 @@ interface MaintenanceRequest {
 }
 
 export default function MaintenancePage() {
+  const router = useRouter()
+  const pathname = usePathname()
   const [requests, setRequests] = useState<MaintenanceRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('open')
-  const router = useRouter()
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async u => {
@@ -57,7 +59,36 @@ export default function MaintenancePage() {
   if (error) return <div className="error">Error: {error}</div>
 
   return (
-    <div className="maintenance-page">
+    <>
+      <DashboardHeader />
+      <div className="maintenance-page">
+        <div className="dash-nav-buttons">
+        <button 
+          className={`nav-btn${pathname === '/properties' ? ' active' : ''}`}
+          onClick={() => router.push('/properties')}
+        >
+          📍 Properties
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/maintenance' ? ' active' : ''}`}
+          onClick={() => router.push('/maintenance')}
+        >
+          🔧 Maintenance
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/deposits' ? ' active' : ''}`}
+          onClick={() => router.push('/deposits')}
+        >
+          🔒 Deposits
+        </button>
+        <button 
+          className={`nav-btn${pathname === '/tenant/portal' ? ' active' : ''}`}
+          onClick={() => router.push('/tenant/portal')}
+        >
+          👥 Tenants
+        </button>
+      </div>
+      
       <div className="page-header">
         <h1>Maintenance Requests</h1>
         <div className="filter-buttons">
@@ -121,11 +152,12 @@ export default function MaintenancePage() {
         ))}
       </div>
 
-      {filteredRequests.length === 0 && (
-        <div className="empty-state">
-          <p>No maintenance requests in this category.</p>
-        </div>
-      )}
-    </div>
+        {filteredRequests.length === 0 && (
+          <div className="empty-state">
+            <p>No maintenance requests yet.</p>
+          </div>
+        )}
+      </div>
+    </>
   )
 }

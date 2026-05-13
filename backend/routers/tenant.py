@@ -20,60 +20,14 @@ WALKTHROUGH_DB = []
 async def get_tenant_portal():
     """Get tenant dashboard data"""
     # TODO: Fetch from database filtered by tenant ID
+    # Return empty portal - will be populated once landlord sets up tenant
     return {
-        "tenant": {
-            "id": "tenant123",
-            "name": "R. Nguyen",
-            "email": "r.nguyen@email.com",
-            "role": "tenant",
-        },
-        "property": {
-            "id": "prop1",
-            "address": "123 Main St, Indianapolis, IN",
-        },
-        "unit": {
-            "id": "unit2a",
-            "number": "2A",
-            "lease": {
-                "id": "lease1",
-                "startDate": "2026-01-10",
-                "endDate": "2027-01-09",
-                "rentAmount": 1950,
-                "dueDate": 1,
-            },
-        },
-        "currentRent": {
-            "dueDate": "2026-05-01",
-            "amount": 1950,
-            "status": "pending",
-            "paymentMethods": [
-                {"id": "bank", "name": "Bank Transfer", "enabled": True},
-                {"id": "card", "name": "Credit/Debit Card", "enabled": True},
-            ],
-        },
-        "documents": [
-            {
-                "id": "doc1",
-                "name": "Lease Agreement",
-                "type": "lease",
-                "uploadedDate": "2026-01-10",
-            },
-            {
-                "id": "doc2",
-                "name": "Move-in Photos",
-                "type": "photo-walkthrough",
-                "uploadedDate": "2026-01-10",
-            },
-        ],
-        "maintenanceRequests": [
-            {
-                "id": "maint1",
-                "title": "Leaky faucet in kitchen",
-                "status": "open",
-                "submittedDate": "2026-04-15",
-                "priority": "medium",
-            },
-        ],
+        "tenant": None,
+        "property": None,
+        "unit": None,
+        "currentRent": None,
+        "documents": [],
+        "maintenanceRequests": [],
     }
 
 
