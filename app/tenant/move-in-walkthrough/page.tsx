@@ -120,6 +120,27 @@ export default function MoveInWalkthroughPage() {
 
   return (
     <div className="move-in-walkthrough-page">
+      <div className="dash-nav-buttons">
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/portal')}
+        >
+          👥 Back to Portal
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/maintenance')}
+        >
+          🔧 Maintenance
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/pay-rent')}
+        >
+          💳 Pay Rent
+        </button>
+      </div>
+
       <div className="page-header">
         <h1>Move-in Photo Walkthrough</h1>
         <p className="instructions">{walkthrough.instructions}</p>

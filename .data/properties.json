@@ -1,19 +1,19 @@
 [
   {
-    "id": "prop_1778644333.214053",
-    "address": "ff",
-    "city": "ff",
-    "state": "ff",
-    "zipCode": "ff",
+    "id": "prop_1778976779.123121",
+    "address": "9965",
+    "city": "irvingston",
+    "state": "penn",
+    "zipCode": "98640",
     "units": [
       {
-        "id": "unit_1778644344.82536",
-        "name": "ff",
-        "tenant": "ff",
-        "rentAmount": 3870.0,
-        "status": "occupied",
-        "dueDate": "31",
-        "paidDate": null,
+        "id": "unit_1778976798.151654",
+        "name": "1A",
+        "tenant": "Atharv Ranjan",
+        "rentAmount": 3665.0,
+        "status": "paid",
+        "dueDate": "2",
+        "paidDate": "2026-05-16T19:13:34.552478",
         "daysLate": null
       }
     ]

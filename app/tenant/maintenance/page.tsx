@@ -4,11 +4,23 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 
+interface TenantData {
+  tenant?: {
+    id: string
+    name: string
+  }
+  unit?: {
+    id: string
+    number: string
+  }
+}
+
 export default function TenantMaintenancePage() {
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [portalData, setPortalData] = useState<TenantData | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -17,16 +29,20 @@ export default function TenantMaintenancePage() {
   })
   const router = useRouter()
 
-  // Mock tenant data - in real app would come from auth context
-  const tenantId = 'tenant123'
-  const unitId = 'unit2a'
+  // Get actual tenant and unit IDs from portal
+  const tenantId = portalData?.tenant?.id || 'tenant123'
+  const unitId = portalData?.unit?.id || 'unit2a'
 
   useEffect(() => {
-    const fetchRequests = async () => {
+    const loadData = async () => {
       try {
-        // In real implementation, would fetch tenant's maintenance requests
-        // For now, showing empty list with form to submit
-        setRequests([])
+        // Get portal data to get actual tenant and unit IDs
+        const portal = await api.tenant.getPortal()
+        setPortalData(portal)
+        
+        // Fetch maintenance requests
+        const data = await api.tenant.getMaintenance()
+        setRequests(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load requests')
         console.error('Error loading requests:', err)
@@ -35,7 +51,7 @@ export default function TenantMaintenancePage() {
       }
     }
 
-    fetchRequests()
+    loadData()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +67,9 @@ export default function TenantMaintenancePage() {
       )
 
       if (result.success) {
-        setRequests([...requests, result.request])
+        // Refresh the list from server to ensure persistence
+        const updatedRequests = await api.tenant.getMaintenance()
+        setRequests(updatedRequests)
         setFormData({ title: '', description: '', priority: 'medium', images: [] })
         setShowForm(false)
       }
@@ -64,6 +82,27 @@ export default function TenantMaintenancePage() {
 
   return (
     <div className="tenant-maintenance-page">
+      <div className="dash-nav-buttons">
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/portal')}
+        >
+          👥 Back to Portal
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/pay-rent')}
+        >
+          💳 Pay Rent
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/move-in-walkthrough')}
+        >
+          🚪 Move-In Walkthrough
+        </button>
+      </div>
+
       <div className="page-header">
         <h1>Maintenance Requests</h1>
         <button 

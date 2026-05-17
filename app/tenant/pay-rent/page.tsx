@@ -1,8 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
+
+interface TenantData {
+  tenant?: {
+    id: string
+    name: string
+  }
+  unit?: {
+    id: string
+    number: string
+    status?: string
+    paidDate?: string
+    lease?: {
+      rentAmount: number
+    }
+  }
+  currentRent?: {
+    amount: number
+    status: string
+    dueDate: string
+  }
+}
 
 export default function PayRentPage() {
   const [amount, setAmount] = useState('')
@@ -10,12 +31,30 @@ export default function PayRentPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [portalData, setPortalData] = useState<TenantData | null>(null)
   const router = useRouter()
 
-  // Mock tenant data - in real app would come from auth context
-  const tenantId = 'tenant123'
-  const unitId = 'unit2a'
-  const expectedAmount = 1950
+  // Get real tenant and unit data from portal
+  const tenantId = portalData?.tenant?.id || 'tenant123'
+  const unitId = portalData?.unit?.id || 'unit2a'
+  const expectedAmount = portalData?.unit?.lease?.rentAmount || 1950
+
+  useEffect(() => {
+    const loadPortalData = async () => {
+      try {
+        const data = await api.tenant.getPortal()
+        setPortalData(data)
+        // Pre-fill amount with expected rent
+        if (data.unit?.lease?.rentAmount) {
+          setAmount(data.unit.lease.rentAmount.toString())
+        }
+      } catch (err) {
+        console.error('Error loading portal data:', err)
+      }
+    }
+
+    loadPortalData()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,8 +105,90 @@ export default function PayRentPage() {
     )
   }
 
+  // Check if rent is already paid
+  const isPaid = portalData?.unit?.status === 'paid'
+  const paidDate = portalData?.unit?.paidDate
+
+  if (isPaid && paidDate) {
+    return (
+      <div className="pay-rent-page">
+        <div className="dash-nav-buttons">
+          <button 
+            className="nav-btn"
+            onClick={() => router.push('/tenant/portal')}
+          >
+            👥 Back to Portal
+          </button>
+          <button 
+            className="nav-btn"
+            onClick={() => router.push('/tenant/maintenance')}
+          >
+            🔧 Maintenance
+          </button>
+          <button 
+            className="nav-btn"
+            onClick={() => router.push('/tenant/move-in-walkthrough')}
+          >
+            🚪 Move-In Walkthrough
+          </button>
+        </div>
+
+        <div className="page-header">
+          <h1>Pay Rent</h1>
+        </div>
+
+        <div className="payment-already-made">
+          <div className="success-badge">✓ PAID</div>
+          <h2>Rent Payment Complete</h2>
+          <div className="payment-info">
+            <div className="info-item">
+              <span className="label">Amount Paid:</span>
+              <span className="value">${expectedAmount.toLocaleString()}</span>
+            </div>
+            <div className="info-item">
+              <span className="label">Payment Date:</span>
+              <span className="value">{new Date(paidDate).toLocaleDateString()}</span>
+            </div>
+            <div className="info-item">
+              <span className="label">Status:</span>
+              <span className="value" style={{ color: '#4CAF50' }}>✓ Completed</span>
+            </div>
+          </div>
+          <p className="message">Thank you for your payment! Your rent for this month has been fully paid.</p>
+          <button 
+            className="primary-btn"
+            onClick={() => router.push('/tenant/portal')}
+          >
+            Back to Portal
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="pay-rent-page">
+      <div className="dash-nav-buttons">
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/portal')}
+        >
+          👥 Back to Portal
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/maintenance')}
+        >
+          🔧 Maintenance
+        </button>
+        <button 
+          className="nav-btn"
+          onClick={() => router.push('/tenant/move-in-walkthrough')}
+        >
+          🚪 Move-In Walkthrough
+        </button>
+      </div>
+
       <div className="page-header">
         <h1>Pay Rent</h1>
       </div>

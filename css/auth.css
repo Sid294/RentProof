@@ -553,6 +553,126 @@
   color: var(--mid);
 }
 
+/* Recent Payments */
+.recent-payments {
+  margin-bottom: 2.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.recent-payments h2 {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--paper);
+}
+
+.payments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.payment-item:last-child {
+  border-bottom: none;
+}
+
+.payment-item:hover {
+  background: var(--bg-raised);
+}
+
+.payment-details {
+  flex: 1;
+}
+
+.payment-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.tenant-name {
+  font-weight: 600;
+  color: var(--paper);
+  font-size: 0.95rem;
+}
+
+.unit-number {
+  font-size: 0.75rem;
+  background: var(--border);
+  color: var(--mid);
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+}
+
+.property-address {
+  font-size: 0.8rem;
+  color: var(--mid);
+  margin-bottom: 0.5rem;
+}
+
+.payment-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: var(--mid);
+}
+
+.payment-method {
+  text-transform: capitalize;
+}
+
+.payment-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.amount {
+  font-weight: 600;
+  color: var(--paid);
+  font-size: 1rem;
+  font-family: var(--font-display);
+}
+
+.status {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.status-completed {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  font-weight: 600;
+}
+
 /* Navigation buttons */
 .dash-nav-buttons {
   display: flex;

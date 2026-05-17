@@ -317,6 +317,47 @@
   gap: 1.5rem;
 }
 
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--paper);
+  border-radius: 3px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-raised);
+  border-color: var(--mid);
+}
+
+.unit-edit-form {
+  background: var(--card-bg);
+  border: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+}
+
+.unit-edit-form form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
 /* ============================================================
    MAINTENANCE PAGE
    ============================================================ */
@@ -368,28 +409,30 @@
 }
 
 .maintenance-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, #1a1f2e 0%, #141821 100%);
+  border: 2px solid #2a3548;
   border-radius: 4px;
   padding: 1.5rem;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .maintenance-card:hover {
-  background: var(--bg-raised);
+  background: linear-gradient(135deg, #232d40 0%, #1a2230 100%);
   border-color: var(--accent);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .maintenance-card.status-open {
-  border-left: 3px solid var(--pending);
+  border-left: 4px solid #ff6b6b;
 }
 
 .maintenance-card.status-in-progress {
-  border-left: 3px solid #ff9800;
+  border-left: 4px solid #ffa500;
 }
 
 .maintenance-card.status-completed {
-  border-left: 3px solid var(--paid);
+  border-left: 4px solid #4CAF50;
 }
 
 .card-header {
@@ -608,6 +651,91 @@
   font-size: 1.1rem;
   color: var(--accent);
   font-weight: 700;
+}
+
+/* Payment Cards */
+.payment-card {
+  background: linear-gradient(135deg, #1a2d2a 0%, #0f2620 100%);
+  border: 2px solid #2a4a42;
+  border-left: 4px solid #4CAF50;
+  border-radius: 4px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.payment-card:hover {
+  background: linear-gradient(135deg, #233835 0%, #172d26 100%);
+  border-color: #4CAF50;
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.2);
+}
+
+.payment-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.payment-card .card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.unit-info {
+  font-size: 0.75rem;
+  color: #a0d8b3;
+  margin: 0.25rem 0 0 0;
+}
+
+.property-info {
+  font-size: 0.8rem;
+  color: #7fb39a;
+  margin: 0.35rem 0 0 0;
+}
+
+.payment-card .badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.payment-card .badge.status-completed {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.payment-card .badge.status-pending {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.payment-card .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.payment-card .info-item .label {
+  font-size: 0.65rem;
+  color: #7fb39a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.payment-card .info-item .value {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 0.4rem;
 }
 
 /* ============================================================
@@ -1125,6 +1253,95 @@
   margin-top: 1rem;
   font-size: 0.9rem;
   color: var(--accent);
+}
+
+.payment-already-made {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1a3a2a 0%, #0f2e1f 100%);
+  border: 2px solid #2d5a47;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.success-badge {
+  display: inline-block;
+  background: #2d5a47;
+  color: #ffffff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  border: 2px solid #4CAF50;
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.2);
+}
+
+.payment-already-made h2 {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1.6rem;
+  color: #4CAF50;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  font-weight: 500;
+  color: #a0d8b3;
+}
+
+.info-item .value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.payment-already-made .message {
+  color: #a0d8b3;
+  font-size: 1rem;
+  margin: 1rem 0 2rem 0;
+}
+
+.payment-already-made .primary-btn {
+  background: #2d5a47;
+  color: white;
+  border: 2px solid #4CAF50;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+}
+
+.payment-already-made .primary-btn:hover {
+  background: #4CAF50;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
 }
 
 /* Move-in Walkthrough */

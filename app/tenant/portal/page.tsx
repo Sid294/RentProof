@@ -144,12 +144,14 @@ export default function TenantPortalPage() {
               <span>{data.currentRent.status.toUpperCase()}</span>
             </div>
           </div>
-          <button 
-            onClick={() => router.push('/tenant/pay-rent')}
-            className="btn-primary"
-          >
-            Pay Rent Now
-          </button>
+          {data.currentRent.status !== 'paid' && (
+            <button 
+              onClick={() => router.push('/tenant/pay-rent')}
+              className="btn-primary"
+            >
+              Pay Rent Now
+            </button>
+          )}
         </div>
 
         {/* Lease Information */}

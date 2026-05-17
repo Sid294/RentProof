@@ -20,11 +20,28 @@ type DashboardSummary = {
   openMaintenance: number
 }
 
+type Payment = {
+  id: string
+  tenantId: string
+  unitId: string
+  amount: number
+  paymentMethod: string
+  status: string
+  timestamp: string
+  propertyInfo?: {
+    id: string
+    address: string
+  }
+  tenantName?: string
+  unitNumber?: string
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const pathname = usePathname()
   const [user, setUser]       = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [payments, setPayments] = useState<Payment[]>([])
   const [summary, setSummary] = useState<DashboardSummary>({
     units: 0,
     rentCollected: '$0',
@@ -38,10 +55,11 @@ export default function DashboardPage() {
       setUser(u)
 
       try {
-        const [properties, rentStatus, maintenance] = await Promise.all([
+        const [properties, rentStatus, maintenance, allPayments] = await Promise.all([
           api.dashboard.getProperties(),
           api.dashboard.getRentStatus(),
           api.dashboard.getMaintenance(),
+          api.dashboard.getPayments(),
         ])
 
         const totalUnits = properties.reduce((count: number, property: any) => {
@@ -77,6 +95,14 @@ export default function DashboardPage() {
           overduePayments,
           openMaintenance,
         })
+
+        // Set payments and sort by most recent first
+        if (allPayments && Array.isArray(allPayments)) {
+          const sortedPayments = allPayments.sort((a: any, b: any) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          })
+          setPayments(sortedPayments.slice(0, 10)) // Show last 10 payments
+        }
       } catch (error) {
         console.error('Failed to load dashboard summary:', error)
       } finally {
@@ -92,10 +118,26 @@ export default function DashboardPage() {
   }
 
   async function handleDeleteAccount() {
-    const ok = confirm(
-      'Are you sure you want to permanently delete your account? This cannot be undone.'
+    const firstConfirm = confirm(
+      'Are you sure you want to permanently delete your account? This action CANNOT be undone.'
     )
-    if (!ok) return
+    if (!firstConfirm) return
+
+    const secondConfirm = confirm(
+      'This will delete your account AND all associated data:\n\n' +
+      '✓ All properties\n' +
+      '✓ All tenants and units\n' +
+      '✓ All rent payments\n' +
+      '✓ All maintenance requests\n\n' +
+      'Type "DELETE" in the next prompt if you are absolutely sure.'
+    )
+    if (!secondConfirm) return
+
+    const userInput = prompt('Type "DELETE" to confirm account deletion:')
+    if (userInput !== 'DELETE') {
+      alert('Account deletion cancelled.')
+      return
+    }
 
     const u = auth.currentUser
     if (!u) {
@@ -236,6 +278,35 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+
+        {payments.length > 0 && (
+          <div className="recent-payments">
+            <h2>Recent Payments</h2>
+            <div className="payments-list">
+              {payments.map((payment) => (
+                <div className="payment-item" key={payment.id}>
+                  <div className="payment-details">
+                    <div className="payment-header">
+                      <span className="tenant-name">{payment.tenantName || 'Unknown Tenant'}</span>
+                      <span className="unit-number">{payment.unitNumber || 'Unit'}</span>
+                    </div>
+                    <div className="property-address">{payment.propertyInfo?.address || 'Property'}</div>
+                    <div className="payment-meta">
+                      <span className="payment-method">{payment.paymentMethod}</span>
+                      <span className="payment-date">
+                        {new Date(payment.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="payment-amount">
+                    <span className="amount">${payment.amount.toLocaleString()}</span>
+                    <span className={`status status-${payment.status}`}>{payment.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="dash-setup">
           <div className="dash-setup-title">Get your portfolio running</div>

@@ -121,6 +121,49 @@ export const api = {
       return res.json()
     },
 
+    updateProperty: async (
+      propertyId: string,
+      address: string,
+      city: string,
+      state: string,
+      zipCode: string
+    ) => {
+      const res = await fetch(`${API_BASE}/dashboard/properties/${propertyId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, city, state, zipCode }),
+      })
+      if (!res.ok) throw new Error('Failed to update property')
+      return res.json()
+    },
+
+    updateUnit: async (
+      propertyId: string,
+      unitId: string,
+      name: string,
+      tenant: string,
+      rentAmount: number,
+      status: string = 'vacant',
+      dueDate: string = ''
+    ) => {
+      const res = await fetch(
+        `${API_BASE}/dashboard/properties/${propertyId}/units/${unitId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            tenant,
+            rentAmount,
+            status,
+            dueDate: dueDate || null,
+          }),
+        }
+      )
+      if (!res.ok) throw new Error('Failed to update unit')
+      return res.json()
+    },
+
     getRentStatus: async () => {
       const res = await fetch(`${API_BASE}/dashboard/rent-status`)
       if (!res.ok) throw new Error('Failed to fetch rent status')
@@ -146,6 +189,22 @@ export const api = {
         body: JSON.stringify({ unitId, title, description, priority, images }),
       })
       if (!res.ok) throw new Error('Failed to create maintenance request')
+      return res.json()
+    },
+
+    updateMaintenanceStatus: async (requestId: string, status: string) => {
+      const res = await fetch(`${API_BASE}/dashboard/maintenance/${requestId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      if (!res.ok) throw new Error('Failed to update maintenance status')
+      return res.json()
+    },
+
+    getPayments: async () => {
+      const res = await fetch(`${API_BASE}/dashboard/payments`)
+      if (!res.ok) throw new Error('Failed to fetch payments')
       return res.json()
     },
 
@@ -176,6 +235,12 @@ export const api = {
     getPortal: async () => {
       const res = await fetch(`${API_BASE}/tenant/portal`)
       if (!res.ok) throw new Error('Failed to fetch tenant portal')
+      return res.json()
+    },
+
+    getMaintenance: async () => {
+      const res = await fetch(`${API_BASE}/tenant/maintenance`)
+      if (!res.ok) throw new Error('Failed to fetch maintenance requests')
       return res.json()
     },
 

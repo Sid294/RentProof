@@ -32,6 +32,8 @@ export default function PropertiesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [unitFormFor, setUnitFormFor] = useState<string | null>(null)
+  const [editingPropertyId, setEditingPropertyId] = useState<string | null>(null)
+  const [editingUnitId, setEditingUnitId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     address: '',
     city: '',
@@ -146,6 +148,78 @@ export default function PropertiesPage() {
     }
   }
 
+  const handleEditProperty = (property: Property) => {
+    setEditingPropertyId(property.id)
+    setFormData({
+      address: property.address,
+      city: property.city,
+      state: property.state,
+      zipCode: property.zipCode || '',
+    })
+  }
+
+  const handleUpdateProperty = async (e: React.FormEvent, propertyId: string) => {
+    e.preventDefault()
+    try {
+      const result = await api.dashboard.updateProperty(
+        propertyId,
+        formData.address,
+        formData.city,
+        formData.state,
+        formData.zipCode
+      )
+
+      if (result.success) {
+        setProperties(prev => prev.map(p => p.id === propertyId ? result.property : p))
+        setEditingPropertyId(null)
+        setFormData({ address: '', city: '', state: '', zipCode: '' })
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update property')
+    }
+  }
+
+  const handleEditUnit = (unit: any) => {
+    setEditingUnitId(unit.id)
+    setUnitFormData({
+      name: unit.name,
+      tenant: unit.tenant,
+      rentAmount: String(unit.rentAmount),
+      status: unit.status,
+      dueDate: unit.dueDate || '',
+    })
+  }
+
+  const handleUpdateUnit = async (e: React.FormEvent, propertyId: string, unitId: string) => {
+    e.preventDefault()
+    try {
+      const rentAmount = Number(unitFormData.rentAmount)
+      const result = await api.dashboard.updateUnit(
+        propertyId,
+        unitId,
+        unitFormData.name,
+        unitFormData.tenant,
+        rentAmount,
+        unitFormData.status,
+        unitFormData.dueDate
+      )
+
+      if (result.success) {
+        setProperties(prev => prev.map(p => p.id === propertyId ? result.property : p))
+        setEditingUnitId(null)
+        setUnitFormData({
+          name: '',
+          tenant: '',
+          rentAmount: '',
+          status: 'vacant',
+          dueDate: '',
+        })
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update unit')
+    }
+  }
+
   if (loading) return <div className="loading">Loading properties...</div>
   if (error) return <div className="error">Error: {error}</div>
 
@@ -233,19 +307,78 @@ export default function PropertiesPage() {
       <div className="properties-list">
         {properties.map((property) => (
           <div key={property.id} className="property-card">
-            <div className="property-header">
-              <h3>{property.address}</h3>
-              <div className="property-header-actions">
-                <span className="property-location">{property.city}, {property.state}</span>
-                <button
-                  type="button"
-                  className="unit-toggle-btn"
-                  onClick={() => setUnitFormFor(unitFormFor === property.id ? null : property.id)}
-                >
-                  {unitFormFor === property.id ? 'Cancel Unit' : 'Add Unit'}
-                </button>
-              </div>
-            </div>
+            {editingPropertyId === property.id ? (
+              <form onSubmit={(e) => handleUpdateProperty(e, property.id)} className="property-form">
+                <div className="form-group">
+                  <label>Address</label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>City</label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>State</label>
+                    <input
+                      type="text"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Zip Code</label>
+                    <input
+                      type="text"
+                      value={formData.zipCode}
+                      onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button type="submit" className="btn-primary">Save</button>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setEditingPropertyId(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div className="property-header">
+                  <h3>{property.address}</h3>
+                  <div className="property-header-actions">
+                    <span className="property-location">{property.city}, {property.state}</span>
+                    <button
+                      type="button"
+                      className="unit-toggle-btn"
+                      onClick={() => handleEditProperty(property)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="unit-toggle-btn"
+                      onClick={() => setUnitFormFor(unitFormFor === property.id ? null : property.id)}
+                    >
+                      {unitFormFor === property.id ? 'Cancel Unit' : 'Add Unit'}
+                    </button>
+                  </div>
+                </div>
 
             {unitFormFor === property.id && (
               <form
@@ -318,13 +451,89 @@ export default function PropertiesPage() {
                 <h4>Units ({property.units.length})</h4>
                 <div className="units-grid">
                   {property.units.map((unit: any) => (
-                    <div key={unit.id} className="unit-badge">
-                      <span className="unit-name">{unit.name}</span>
-                      <span className={`unit-status ${isOverdue(unit.dueDate) ? 'late' : unit.status}`}>
-                        {isOverdue(unit.dueDate) ? 'Overdue' : unit.status}
-                      </span>
-                      <span className="unit-due-date">{formatDueDay(unit.dueDate)}</span>
-                    </div>
+                    editingUnitId === unit.id ? (
+                      <div key={unit.id} className="unit-edit-form">
+                        <form onSubmit={(e) => handleUpdateUnit(e, property.id, unit.id)}>
+                          <div className="form-row">
+                            <div className="form-group">
+                              <label>Unit Name</label>
+                              <input
+                                type="text"
+                                value={unitFormData.name}
+                                onChange={(e) => setUnitFormData({ ...unitFormData, name: e.target.value })}
+                                required
+                              />
+                            </div>
+                            <div className="form-group">
+                              <label>Tenant</label>
+                              <input
+                                type="text"
+                                value={unitFormData.tenant}
+                                onChange={(e) => setUnitFormData({ ...unitFormData, tenant: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                          <div className="form-row">
+                            <div className="form-group">
+                              <label>Rent Amount</label>
+                              <input
+                                type="number"
+                                value={unitFormData.rentAmount}
+                                onChange={(e) => setUnitFormData({ ...unitFormData, rentAmount: e.target.value })}
+                                min="0"
+                                step="0.01"
+                                required
+                              />
+                            </div>
+                            <div className="form-group">
+                              <label>Status</label>
+                              <select
+                                value={unitFormData.status}
+                                onChange={(e) => setUnitFormData({ ...unitFormData, status: e.target.value })}
+                              >
+                                <option value="vacant">Vacant</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                              </select>
+                            </div>
+                            <div className="form-group">
+                              <label>Due Day</label>
+                              <input
+                                type="number"
+                                value={unitFormData.dueDate}
+                                onChange={(e) => setUnitFormData({ ...unitFormData, dueDate: e.target.value })}
+                                min="1"
+                                max="31"
+                              />
+                            </div>
+                          </div>
+                          <div className="form-actions">
+                            <button type="submit" className="btn-primary">Save</button>
+                            <button
+                              type="button"
+                              className="btn-secondary"
+                              onClick={() => setEditingUnitId(null)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    ) : (
+                      <div
+                        key={unit.id}
+                        className="unit-badge"
+                        onClick={() => handleEditUnit(unit)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <span className="unit-name">{unit.name}</span>
+                        <span className={`unit-status ${isOverdue(unit.dueDate) ? 'late' : unit.status}`}>
+                          {isOverdue(unit.dueDate) ? 'Overdue' : unit.status}
+                        </span>
+                        <span className="unit-due-date">{formatDueDay(unit.dueDate)}</span>
+                      </div>
+                    )
                   ))}
                 </div>
               </div>
@@ -333,6 +542,8 @@ export default function PropertiesPage() {
               <div className="empty-state">
                 <p>No units added yet.</p>
               </div>
+            )}
+              </>
             )}
           </div>
         ))}

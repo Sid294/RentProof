@@ -27,6 +27,7 @@ export default function MaintenancePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('open')
+  const [updating, setUpdating] = useState<string | null>(null)
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async u => {
@@ -50,6 +51,27 @@ export default function MaintenancePage() {
 
   const getPriorityClass = (priority: string) => `priority-${priority}`
   const getStatusClass = (status: string) => `status-${status}`
+
+  const handleStatusUpdate = async (requestId: string, newStatus: string) => {
+    try {
+      setUpdating(requestId)
+      const result = await api.dashboard.updateMaintenanceStatus(requestId, newStatus)
+      
+      if (result.success) {
+        // Update local state
+        setRequests(requests.map(r => 
+          r.id === requestId 
+            ? { ...r, status: newStatus, completedDate: newStatus === 'completed' ? new Date().toISOString() : r.completedDate }
+            : r
+        ))
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update status')
+      console.error('Error updating status:', err)
+    } finally {
+      setUpdating(null)
+    }
+  }
 
   const filteredRequests = filter === 'all' 
     ? requests 
@@ -145,6 +167,32 @@ export default function MaintenancePage() {
                     <span className="label">Completed</span>
                     <span className="value">{new Date(request.completedDate).toLocaleDateString()}</span>
                   </div>
+                )}
+              </div>
+
+              <div className="card-actions">
+                {request.status !== 'completed' && (
+                  <>
+                    {request.status === 'open' && (
+                      <button
+                        onClick={() => handleStatusUpdate(request.id, 'in-progress')}
+                        disabled={updating === request.id}
+                        className="btn-secondary"
+                      >
+                        {updating === request.id ? 'Updating...' : 'Mark In Progress'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleStatusUpdate(request.id, 'completed')}
+                      disabled={updating === request.id}
+                      className="btn-primary"
+                    >
+                      {updating === request.id ? 'Updating...' : 'Mark Completed'}
+                    </button>
+                  </>
+                )}
+                {request.status === 'completed' && (
+                  <span className="completed-text">✓ Completed</span>
                 )}
               </div>
             </div>

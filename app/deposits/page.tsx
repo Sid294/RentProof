@@ -21,10 +21,27 @@ interface Deposit {
   returnAmount?: number
 }
 
+interface Payment {
+  id: string
+  tenantId: string
+  unitId: string
+  amount: number
+  paymentMethod: string
+  status: string
+  timestamp: string
+  propertyInfo?: {
+    id: string
+    address: string
+  }
+  tenantName?: string
+  unitNumber?: string
+}
+
 export default function DepositsPage() {
   const router = useRouter()
   const pathname = usePathname()
   const [deposits, setDeposits] = useState<Deposit[]>([])
+  const [payments, setPayments] = useState<Payment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,11 +53,15 @@ export default function DepositsPage() {
       }
 
       try {
-        const data = await api.dashboard.getDeposits()
-        setDeposits(data)
+        const [depositsData, paymentsData] = await Promise.all([
+          api.dashboard.getDeposits(),
+          api.dashboard.getPayments(),
+        ])
+        setDeposits(depositsData)
+        setPayments(paymentsData)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load deposits')
-        console.error('Error loading deposits:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load data')
+        console.error('Error loading data:', err)
       } finally {
         setLoading(false)
       }
@@ -163,6 +184,54 @@ export default function DepositsPage() {
           <p>No deposits recorded yet.</p>
         </div>
       )}
+
+      <div className="page-header" style={{ marginTop: '3rem' }}>
+        <h2>Rent Payments</h2>
+      </div>
+
+      <div className="payments-list">
+        {payments.length > 0 ? (
+          payments.map((payment) => (
+            <div className="payment-card" key={payment.id}>
+              <div className="card-header">
+                <div>
+                  <h3>{payment.tenantName || 'Unknown Tenant'}</h3>
+                  <p className="unit-info">{payment.unitNumber ? `Unit ${payment.unitNumber}` : 'Property'}</p>
+                  <p className="property-info">{payment.propertyInfo?.address || 'N/A'}</p>
+                </div>
+                <span className={`badge status-${payment.status}`}>
+                  {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                </span>
+              </div>
+
+              <div className="card-content">
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="label">Amount</span>
+                    <span className="value">${payment.amount.toLocaleString()}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Payment Method</span>
+                    <span className="value" style={{ textTransform: 'capitalize' }}>
+                      {payment.paymentMethod}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Payment Date</span>
+                    <span className="value">
+                      {new Date(payment.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="empty-state">
+            <p>No payments recorded yet.</p>
+          </div>
+        )}
+      </div>
     </div>
     </>
   )

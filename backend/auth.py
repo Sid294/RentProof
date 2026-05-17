@@ -143,7 +143,7 @@ async def signup(request: SignupRequest, background_tasks: BackgroundTasks):
 
 @router.post("/delete")
 async def delete_account(request: Request):
-    """Delete user account and remove from database"""
+    """Delete user account and all associated data (properties, payments, maintenance, etc.)"""
     logger.info(f"DELETE POST handler called")
     
     try:
@@ -151,12 +151,35 @@ async def delete_account(request: Request):
         email = body.get("email", "")
         logger.info(f"Delete request for email: {email}")
         
+        # Delete from in-memory user database
         if email and email in USERS_DB:
             del USERS_DB[email]
             logger.info(f"User {email} deleted from USERS_DB")
         
-        logger.info(f"Delete successful, returning success")
-        return {"success": True}
+        # Delete all user data files
+        from pathlib import Path
+        import json
+        
+        BASE_DIR = Path(__file__).resolve().parents[1]
+        DATA_DIR = BASE_DIR / ".data"
+        
+        # List of data files to delete
+        data_files = [
+            DATA_DIR / "properties.json",
+            DATA_DIR / "payments.json",
+            DATA_DIR / "maintenance.json",
+        ]
+        
+        for file_path in data_files:
+            if file_path.exists():
+                try:
+                    file_path.unlink()  # Delete the file
+                    logger.info(f"Deleted data file: {file_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to delete {file_path}: {e}")
+        
+        logger.info(f"Delete account successful - user {email} and all associated data removed")
+        return {"success": True, "message": "Account and all associated data deleted successfully"}
     except Exception as e:
-        logger.error(f"Delete error: {str(e)}", exc_info=True)
+        logger.error(f"Delete account error: {str(e)}", exc_info=True)
         return {"success": False, "error": str(e)}
