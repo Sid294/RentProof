@@ -24,6 +24,7 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://localhost:3002",
     "http://localhost:8000",
     os.getenv("FRONTEND_URL", "http://localhost:3000"),
 ]
@@ -72,13 +73,10 @@ app.add_middleware(LoggingMiddleware)
 
 # Import routers
 import backend.auth as auth
-import backend.routers.content as content
-import backend.routers.dashboard as dashboard
 import backend.routers.tenant as tenant
-# Include routers
-app.include_router(content.router, prefix="/api/content", tags=["content"])
+
+# Include routers (tenant portal only)
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(tenant.router, prefix="/api/tenant", tags=["tenant"])
 
 

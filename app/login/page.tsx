@@ -74,34 +74,20 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-left">
-        <Link href="/" className="auth-logo">Rent<span className="accent">Proof</span></Link>
-
-        <div className="auth-left-body">
-          <div className="auth-left-eyebrow">Property management</div>
-          <h2>Your portfolio.<br />Under control.</h2>
-          <p className="auth-left-sub">
-            Everything you need to run a professional rental operation -- rent tracking,
-            maintenance, documentation, and deposit protection in one place.
-          </p>
-          <div className="auth-trust-items">
-            <div className="auth-trust-item">Automated rent reminders and late fees</div>
-            <div className="auth-trust-item">Timestamped move-in documentation</div>
-            <div className="auth-trust-item">One-click dispute evidence export</div>
-            <div className="auth-trust-item">Free tenant portal, no setup friction</div>
-          </div>
-        </div>
-
-        <div className="auth-left-footer">
-          2026 RentProof Inc. All rights reserved.
-        </div>
-      </div>
+      <style>{`
+        .auth-left {
+          display: none;
+        }
+        .auth-right {
+          width: 100%;
+        }
+      `}</style>
 
       <div className="auth-right">
         <div className="auth-card">
-          <Link href="/" className="auth-mobile-logo">Rent<span className="accent">Proof</span></Link>
+          <Link href="/tenant/portal" className="auth-mobile-logo">Rent<span className="accent">Proof</span></Link>
 
-          <div className="auth-card-eyebrow">Welcome back</div>
+          <div className="auth-card-eyebrow">Tenant Portal</div>
           <h1>Log in</h1>
           <p className="auth-card-sub">
             Don&rsquo;t have an account?{' '}

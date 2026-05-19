@@ -232,8 +232,11 @@ export const api = {
 
   // ==================== TENANT ENDPOINTS ====================
   tenant: {
-    getPortal: async () => {
-      const res = await fetch(`${API_BASE}/tenant/portal`)
+    getPortal: async (email?: string) => {
+      const url = email 
+        ? `${API_BASE}/tenant/portal?email=${encodeURIComponent(email)}`
+        : `${API_BASE}/tenant/portal`
+      const res = await fetch(url)
       if (!res.ok) throw new Error('Failed to fetch tenant portal')
       return res.json()
     },

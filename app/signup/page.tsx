@@ -33,7 +33,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => {
-      if (u) router.replace('/dashboard')
+      if (u) router.replace('/tenant/portal')
     })
     return unsub
   }, [router])
@@ -74,8 +74,8 @@ export default function SignupPage() {
         // Don't block signup if backend fails
       }
       
-      console.log("Redirecting to dashboard...");
-      router.replace('/dashboard')
+      console.log("Redirecting to tenant portal...");
+      router.replace('/tenant/portal')
     } catch (err: unknown) {
       setGoogleLoading(false)
       console.error("Google sign-in error:", err);
@@ -129,8 +129,8 @@ export default function SignupPage() {
         return
       }
 
-      console.log("Redirecting to dashboard...");
-      router.replace('/dashboard')
+      console.log("Redirecting to tenant portal...");
+      router.replace('/tenant/portal')
     } catch (err: unknown) {
       setLoading(false)
       console.error("Signup error:", err);
@@ -141,34 +141,20 @@ export default function SignupPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-left">
-        <Link href="/" className="auth-logo">Rent<span className="accent">Proof</span></Link>
-
-        <div className="auth-left-body">
-          <div className="auth-left-eyebrow">Free 14-day trial</div>
-          <h2>Set up in 10 minutes.<br />Running today.</h2>
-          <p className="auth-left-sub">
-            Add your properties, invite your tenants with a link, and go live.
-            No credit card required. No commitment.
-          </p>
-          <div className="auth-trust-items">
-            <div className="auth-trust-item">14-day free trial, cancel any time</div>
-            <div className="auth-trust-item">Tenants join free -- you invite them</div>
-            <div className="auth-trust-item">No credit card to start</div>
-            <div className="auth-trust-item">Import existing properties in minutes</div>
-          </div>
-        </div>
-
-        <div className="auth-left-footer">
-          2026 RentProof Inc. Built for landlords, loved by tenants.
-        </div>
-      </div>
+      <style>{`
+        .auth-left {
+          display: none;
+        }
+        .auth-right {
+          width: 100%;
+        }
+      `}</style>
 
       <div className="auth-right">
         <div className="auth-card">
-          <Link href="/" className="auth-mobile-logo">Rent<span className="accent">Proof</span></Link>
+          <Link href="/tenant/portal" className="auth-mobile-logo">Rent<span className="accent">Proof</span></Link>
 
-          <div className="auth-card-eyebrow">Get started</div>
+          <div className="auth-card-eyebrow">Tenant Portal</div>
           <h1>Create account</h1>
           <p className="auth-card-sub">
             Already have an account?{' '}

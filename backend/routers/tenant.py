@@ -1,17 +1,19 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from backend.models import (
     TenantPortal, PaymentRequest, PaymentResponse, Payment,
     TenantMaintenanceRequest, MoveInWalkthrough, WalkthroughRoom,
     WalkthroughSubmitRequest, WalkthroughSubmitResponse, Certificate
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 from pathlib import Path
 import json
+import logging
+from backend.firebase import get_tenant, get_maintenance_requests, get_payments, get_walkthroughs
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-# Mock data storage
 PAYMENTS_DB = []
 WALKTHROUGH_DB = []
 
@@ -65,84 +67,104 @@ def write_payments(payments: list[dict]) -> None:
 # ==================== Tenant Portal ====================
 
 @router.get("/portal", response_model=dict)
-async def get_tenant_portal():
-    """Get tenant dashboard data"""
-    # TODO: Fetch from database filtered by tenant ID
-    # For now, return demo tenant data
-    from datetime import datetime, timedelta
-    from backend.routers.dashboard import read_properties
-    
-    # Try to get real data from properties
-    properties = read_properties()
-    
-    # Find a property with a tenant
-    for prop in properties:
-        if prop.units and len(prop.units) > 0:
-            unit = prop.units[0]
-            if unit.tenant:
-                # Calculate lease dates
-                today = datetime.now()
-                lease_start = today - timedelta(days=90)
-                lease_end = today + timedelta(days=275)
-                
-                # Calculate next rent due date
-                due_day = int(unit.dueDate) if isinstance(unit.dueDate, str) and unit.dueDate.isdigit() else 1
-                next_month = today.replace(day=1) + timedelta(days=32)
-                next_due = next_month.replace(day=min(due_day, 28))
-                
-                return {
-                    "tenant": {
-                        "id": f"tenant_{hashlib.md5(unit.tenant.encode()).hexdigest()}",
-                        "name": unit.tenant,
-                        "email": f"{unit.tenant.lower().replace(' ', '.')}@example.com",
-                        "role": "tenant"
-                    },
-                    "property": {
-                        "id": prop.id,
-                        "address": f"{prop.address}, {prop.city}, {prop.state} {prop.zipCode}"
-                    },
-                    "unit": {
-                        "id": unit.id,
-                        "number": unit.name,
-                        "status": unit.status,
-                        "paidDate": unit.paidDate,
-                        "lease": {
-                            "id": f"lease_{unit.id}",
-                            "startDate": lease_start.isoformat(),
-                            "endDate": lease_end.isoformat(),
-                            "rentAmount": unit.rentAmount,
-                            "dueDate": due_day
-                        }
-                    },
-                    "currentRent": {
-                        "dueDate": next_due.isoformat(),
-                        "amount": unit.rentAmount,
-                        "status": unit.status if unit.status in ['paid', 'pending', 'late'] else 'pending',
-                        "paymentMethods": [
-                            {"type": "bank", "label": "Bank Transfer"},
-                            {"type": "card", "label": "Credit Card"}
-                        ]
-                    },
-                    "documents": [
-                        {
-                            "id": "doc_1",
-                            "name": "Lease Agreement",
-                            "type": "pdf",
-                            "uploadedDate": lease_start.isoformat()
-                        }
-                    ],
-                    "maintenanceRequests": read_maintenance()
+async def get_tenant_portal(email: str = None):
+    """Get tenant dashboard data from Firestore"""
+    try:
+        # TODO: Get tenant email from Firebase Auth token
+        # For now, use query parameter or extract from Authorization header
+        if not email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Tenant email is required (use ?email=user@example.com)"
+            )
+        
+        logger.info(f"Fetching tenant portal data for {email}")
+        
+        # Fetch tenant data from Firestore
+        import asyncio
+        loop = asyncio.new_event_loop()
+        tenant_data = loop.run_until_complete(get_tenant(email))
+        loop.close()
+        
+        if not tenant_data:
+            logger.warning(f"Tenant {email} not found in Firestore")
+            return {
+                "tenant": None,
+                "property": None,
+                "unit": None,
+                "currentRent": None,
+                "documents": [],
+                "maintenanceRequests": [],
+            }
+        
+        # Fetch related data
+        loop = asyncio.new_event_loop()
+        maintenance_requests = loop.run_until_complete(get_maintenance_requests(email))
+        payments = loop.run_until_complete(get_payments(email))
+        walkthroughs = loop.run_until_complete(get_walkthroughs(email))
+        loop.close()
+        
+        # Calculate lease dates
+        today = datetime.now()
+        lease_start = today - timedelta(days=90)
+        lease_end = today + timedelta(days=275)
+        
+        # Calculate next rent due date
+        due_day = tenant_data.get("due_date", 1)
+        next_month = today.replace(day=1) + timedelta(days=32)
+        next_due = next_month.replace(day=min(due_day, 28))
+        
+        # Find most recent payment to determine status
+        rent_status = "pending"
+        if payments:
+            latest_payment = max(payments, key=lambda x: x.get("created_at", ""))
+            payment_date = latest_payment.get("created_at", "")
+            if payment_date >= next_due.isoformat():
+                rent_status = "paid"
+            else:
+                rent_status = "late"
+        
+        return {
+            "tenant": {
+                "id": tenant_data.get("id", f"tenant_{email}"),
+                "name": tenant_data.get("name", email.split("@")[0]),
+                "email": email,
+                "role": "tenant"
+            },
+            "property": {
+                "id": tenant_data.get("property_id", "prop_001"),
+                "address": tenant_data.get("property_address", "Unknown Address")
+            },
+            "unit": {
+                "id": tenant_data.get("unit_id", "unit_001"),
+                "number": tenant_data.get("unit_number", "101"),
+                "status": tenant_data.get("status", "occupied"),
+                "lease": {
+                    "id": f"lease_{tenant_data.get('unit_id', 'unit_001')}",
+                    "startDate": lease_start.isoformat(),
+                    "endDate": lease_end.isoformat(),
+                    "rentAmount": tenant_data.get("rent_amount", 1500),
+                    "dueDate": due_day
                 }
-    
-    # Return empty portal if no tenants found
-    return {
-        "tenant": None,
-        "property": None,
-        "unit": None,
-        "currentRent": None,
-        "documents": [],
-        "maintenanceRequests": [],
-    }
+            },
+            "currentRent": {
+                "dueDate": next_due.isoformat(),
+                "amount": tenant_data.get("rent_amount", 1500),
+                "status": rent_status,
+                "paymentMethods": [
+                    {"type": "bank", "label": "Bank Transfer"},
+                    {"type": "card", "label": "Credit Card"}
+                ]
+            },
+            "documents": walkthroughs if walkthroughs else [],
+            "maintenanceRequests": maintenance_requests
+        }
+    except Exception as e:
+        logger.error(f"Error fetching tenant portal: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch tenant portal data"
+        )
 
 
 # ==================== Rent Payment ====================

@@ -54,7 +54,7 @@ export default function TenantPortalPage() {
       }
 
       try {
-        const portalData = await api.tenant.getPortal()
+        const portalData = await api.tenant.getPortal(u.email || undefined)
         setData(portalData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load tenant portal')

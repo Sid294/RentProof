@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 from backend.send_email import send_welcome_email
+from backend.firebase import save_tenant, get_tenant
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -97,11 +98,33 @@ async def signup(request: SignupRequest, background_tasks: BackgroundTasks):
                 id=f"user_{request.email}",
                 email=request.email,
                 name=request.name,
-                role="landlord",
+                role="tenant",
                 plan=request.plan
             )
             
-            # Store user (TODO: Use real database)
+            # Store user in Firestore
+            tenant_data = {
+                "id": new_user.id,
+                "email": new_user.email,
+                "name": new_user.name,
+                "role": new_user.role,
+                "plan": new_user.plan,
+                "created_at": datetime.now().isoformat(),
+                "updated_at": datetime.now().isoformat(),
+            }
+            
+            # Save to Firestore
+            import asyncio
+            loop = asyncio.new_event_loop()
+            firestore_saved = loop.run_until_complete(save_tenant(request.email, tenant_data))
+            loop.close()
+            
+            if firestore_saved:
+                logger.info(f"✓ Tenant {request.email} saved to Firestore")
+            else:
+                logger.warning(f"✗ Failed to save tenant {request.email} to Firestore, but continuing")
+            
+            # Also store in local DB for fallback
             USERS_DB[request.email] = {
                 "user": new_user,
                 "password_hash": request.password,  # TODO: Hash this!
