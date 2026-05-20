@@ -9,7 +9,7 @@ import hashlib
 from pathlib import Path
 import json
 import logging
-from backend.firebase import get_tenant, get_maintenance_requests, get_payments, get_walkthroughs
+from backend.firebase import get_tenant, get_tenant_by_name, get_maintenance_requests, get_payments, get_walkthroughs
 
 logger = logging.getLogger(__name__)
 
@@ -67,42 +67,130 @@ def write_payments(payments: list[dict]) -> None:
 # ==================== Tenant Portal ====================
 
 @router.get("/portal", response_model=dict)
-async def get_tenant_portal(email: str = None):
+async def get_tenant_portal(email: str = None, name: str = None):
     """Get tenant dashboard data from Firestore"""
     try:
-        # TODO: Get tenant email from Firebase Auth token
-        # For now, use query parameter or extract from Authorization header
-        if not email:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Tenant email is required (use ?email=user@example.com)"
-            )
+        logger.info(f"Fetching tenant portal data - email: {email}, name: {name}")
         
-        logger.info(f"Fetching tenant portal data for {email}")
+        tenant_data = None
         
-        # Fetch tenant data from Firestore
-        import asyncio
-        loop = asyncio.new_event_loop()
-        tenant_data = loop.run_until_complete(get_tenant(email))
-        loop.close()
+        # Try to fetch by email first
+        if email:
+            tenant_data = await get_tenant(email)
         
+        # Try to fetch by name if email lookup failed or name is provided
+        if not tenant_data and name:
+            tenant_data = await get_tenant_by_name(name)
+            if tenant_data:
+                email = tenant_data.get("id")  # Use the tenant's ID (usually email) from Firebase
+        
+        # Default to "Atharv Ranjan" if nothing found
         if not tenant_data:
-            logger.warning(f"Tenant {email} not found in Firestore")
+            logger.info("Attempting to fetch default tenant: Atharv Ranjan")
+            tenant_data = await get_tenant_by_name("Atharv Ranjan")
+            if tenant_data:
+                email = tenant_data.get("id")
+        
+        # If still no tenant found, return empty state or test tenant
+        if not tenant_data:
+            logger.warning(f"Tenant not found in Firestore (email: {email}, name: {name})")
+            # If a specific email was requested, return their test data
+            if email:
+                if email == "test123@gmail.com":
+                    today = datetime.now()
+                    lease_start = today - timedelta(days=60)
+                    lease_end = today + timedelta(days=305)
+                    next_month = today.replace(day=1) + timedelta(days=32)
+                    next_due = next_month.replace(day=1)
+                    
+                    return {
+                        "tenant": {
+                            "id": "test123@gmail.com",
+                            "name": "Test Tenant",
+                            "email": "test123@gmail.com",
+                            "role": "tenant"
+                        },
+                        "property": {
+                            "id": "prop_test",
+                            "address": "100 Test Street, Testville, TX 75000"
+                        },
+                        "unit": {
+                            "id": "unit_test",
+                            "number": "1A",
+                            "status": "occupied",
+                            "lease": {
+                                "id": "lease_test",
+                                "startDate": lease_start.isoformat(),
+                                "endDate": lease_end.isoformat(),
+                                "rentAmount": 1800,
+                                "dueDate": 1
+                            }
+                        },
+                        "currentRent": {
+                            "dueDate": next_due.isoformat(),
+                            "amount": 1800,
+                            "status": "pending",
+                            "paymentMethods": [
+                                {"type": "bank", "label": "Bank Transfer"},
+                                {"type": "card", "label": "Credit Card"}
+                            ]
+                        },
+                        "documents": [],
+                        "maintenanceRequests": []
+                    }
+            
+            # Default fallback for Atharv Ranjan
+            today = datetime.now()
+            lease_start = today - timedelta(days=90)
+            lease_end = today + timedelta(days=275)
+            next_month = today.replace(day=1) + timedelta(days=32)
+            next_due = next_month.replace(day=1)
+            
             return {
-                "tenant": None,
-                "property": None,
-                "unit": None,
-                "currentRent": None,
+                "tenant": {
+                    "id": "atharv_ranjan",
+                    "name": "Atharv Ranjan",
+                    "email": "atharv.ranjan@example.com",
+                    "role": "tenant"
+                },
+                "property": {
+                    "id": "prop_001",
+                    "address": "456 Oak Avenue, San Francisco, CA 94103"
+                },
+                "unit": {
+                    "id": "unit_456",
+                    "number": "B2",
+                    "status": "occupied",
+                    "lease": {
+                        "id": "lease_456",
+                        "startDate": lease_start.isoformat(),
+                        "endDate": lease_end.isoformat(),
+                        "rentAmount": 3200,
+                        "dueDate": 1
+                    }
+                },
+                "currentRent": {
+                    "dueDate": next_due.isoformat(),
+                    "amount": 3200,
+                    "status": "pending",
+                    "paymentMethods": [
+                        {"type": "bank", "label": "Bank Transfer"},
+                        {"type": "card", "label": "Credit Card"}
+                    ]
+                },
                 "documents": [],
-                "maintenanceRequests": [],
+                "maintenanceRequests": []
             }
         
         # Fetch related data
-        loop = asyncio.new_event_loop()
-        maintenance_requests = loop.run_until_complete(get_maintenance_requests(email))
-        payments = loop.run_until_complete(get_payments(email))
-        walkthroughs = loop.run_until_complete(get_walkthroughs(email))
-        loop.close()
+        if email:
+            maintenance_requests = await get_maintenance_requests(email)
+            payments = await get_payments(email)
+            walkthroughs = await get_walkthroughs(email)
+        else:
+            maintenance_requests = []
+            payments = []
+            walkthroughs = []
         
         # Calculate lease dates
         today = datetime.now()
@@ -127,8 +215,8 @@ async def get_tenant_portal(email: str = None):
         return {
             "tenant": {
                 "id": tenant_data.get("id", f"tenant_{email}"),
-                "name": tenant_data.get("name", email.split("@")[0]),
-                "email": email,
+                "name": tenant_data.get("name", email.split("@")[0] if email else "Tenant"),
+                "email": email or tenant_data.get("email", "unknown@example.com"),
                 "role": "tenant"
             },
             "property": {
@@ -160,10 +248,10 @@ async def get_tenant_portal(email: str = None):
             "maintenanceRequests": maintenance_requests
         }
     except Exception as e:
-        logger.error(f"Error fetching tenant portal: {str(e)}")
+        logger.error(f"Error fetching tenant portal: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch tenant portal data"
+            detail=f"Failed to fetch tenant portal data: {str(e)}"
         )
 
 

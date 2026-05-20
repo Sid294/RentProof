@@ -1,9 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import DashboardHeader from '@/components/layout/DashboardHeader'
 
@@ -41,20 +39,19 @@ interface TenantPortalData {
 
 export default function TenantPortalPage() {
   const router = useRouter()
-  const pathname = usePathname()
   const [data, setData] = useState<TenantPortalData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async u => {
-      if (!u) {
+    const load = async () => {
+      const email = localStorage.getItem('tenant_email')
+      if (!email) {
         router.push('/login')
         return
       }
-
       try {
-        const portalData = await api.tenant.getPortal(u.email || undefined)
+        const portalData = await api.tenant.getPortal(email)
         setData(portalData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load tenant portal')
@@ -62,9 +59,14 @@ export default function TenantPortalPage() {
       } finally {
         setLoading(false)
       }
-    })
-    return unsub
+    }
+    load()
   }, [router])
+
+  const signOut = () => {
+    localStorage.removeItem('tenant_email')
+    router.push('/login')
+  }
 
   if (loading) return <div className="loading">Loading tenant portal...</div>
   if (error) return <div className="error">Error: {error}</div>
@@ -95,36 +97,16 @@ export default function TenantPortalPage() {
     <>
       <DashboardHeader />
       <div className="tenant-portal">
-        <div className="dash-nav-buttons">
-        <button 
-          className={`nav-btn${pathname === '/properties' ? ' active' : ''}`}
-          onClick={() => router.push('/properties')}
-        >
-          📍 Properties
-        </button>
-        <button 
-          className={`nav-btn${pathname === '/maintenance' ? ' active' : ''}`}
-          onClick={() => router.push('/maintenance')}
-        >
-          🔧 Maintenance
-        </button>
-        <button 
-          className={`nav-btn${pathname === '/deposits' ? ' active' : ''}`}
-          onClick={() => router.push('/deposits')}
-        >
-          🔒 Deposits
-        </button>
-        <button 
-          className={`nav-btn${pathname === '/tenant/portal' ? ' active' : ''}`}
-          onClick={() => router.push('/tenant/portal')}
-        >
-          👥 Tenants
-        </button>
-      </div>
-      
-      <div className="portal-header">
-        <h1>Welcome, {data.tenant.name}</h1>
-        <p className="property-location">{data.property.address}</p>
+        <div className="portal-header">
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div>
+              <h1>Welcome, {data.tenant.name}</h1>
+              <p className="property-location">{data.property.address}</p>
+            </div>
+            <div>
+              <button onClick={signOut} className="btn-secondary">Sign out</button>
+            </div>
+          </div>
       </div>
 
       <div className="portal-grid">

@@ -1,0 +1,1236 @@
+/* ============================================================
+   DASHBOARD HEADER & LOGO
+   ============================================================ */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  background: var(--card-bg);
+  border-radius: 0;
+}
+
+.dashboard-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.dashboard-logo .accent {
+  color: var(--accent);
+  margin-left: 0.1em;
+}
+
+/* Tenant Portal Styling */
+
+.tenant-portal {
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.dash-nav-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.nav-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background: var(--bg-raised);
+  border-color: var(--accent);
+}
+
+.nav-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.portal-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.portal-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--paper);
+}
+
+.property-location {
+  color: var(--mid);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.portal-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.portal-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(232, 79, 43, 0.1);
+}
+
+.portal-card h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--paper);
+}
+
+.rent-card {
+  border-left: 4px solid var(--pending);
+}
+
+.rent-card.status-paid {
+  border-left-color: var(--paid);
+}
+
+.rent-card.status-late {
+  border-left-color: var(--late);
+}
+
+.rent-card.status-pending {
+  border-left-color: var(--pending);
+}
+
+.rent-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rent-details > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rent-details .label {
+  color: var(--mid);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rent-details .value {
+  font-size: 1.5rem;
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.rent-status {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rent-status.paid {
+  background: var(--paid-bg);
+  color: var(--paid);
+}
+
+.rent-status.pending {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.rent-status.late {
+  background: var(--late-bg);
+  color: var(--late);
+}
+
+.unit-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.unit-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.unit-number {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.lease-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.lease-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lease-item .label {
+  color: var(--mid);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lease-item .value {
+  color: var(--paper);
+  font-size: 0.95rem;
+}
+
+.maintenance-card,
+.documents-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.maintenance-item,
+.document-item {
+  padding: 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.maintenance-item h3,
+.document-item h3 {
+  font-size: 0.95rem;
+  color: var(--paper);
+  margin: 0;
+}
+
+.maintenance-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.maintenance-status.open {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.maintenance-status.resolved {
+  background: var(--paid-bg);
+  color: var(--paid);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--mid);
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+}
+
+.error {
+  color: var(--late);
+}
+
+.loading {
+  color: var(--accent);
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  padding: 0.85rem 1.75rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: #d43a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(232, 79, 43, 0.3);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+
+.documents-list,
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.document-item:hover {
+  border-color: var(--accent);
+  background: rgba(232, 79, 43, 0.05);
+}
+
+.document-icon {
+  font-size: 1.5rem;
+}
+
+.document-name {
+  flex: 1;
+  color: var(--paper);
+  font-size: 0.95rem;
+}
+
+.document-date {
+  color: var(--mid);
+  font-size: 0.8rem;
+}
+
+.request-item {
+  padding: 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.request-title {
+  flex: 1;
+  color: var(--paper);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.request-status {
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.request-date {
+  color: var(--mid);
+  font-size: 0.8rem;
+}
+
+.empty-message {
+  color: var(--mid);
+  font-size: 0.95rem;
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.portal-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.portal-actions .btn-secondary {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tenant-portal {
+    padding: 1rem;
+  }
+  
+  .portal-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .dash-nav-buttons {
+    gap: 0.5rem;
+  }
+  
+  .nav-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .portal-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .lease-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+    Pages: Maintenance, Pay Rent, Move-In Walkthrough
+    Professional, polished styling with better layout
+    ============================================================ */
+
+.tenant-maintenance-page,
+.pay-rent-page,
+.move-in-walkthrough-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: transparent;
+}
+
+/* Page Headers - Consistent styling */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--paper);
+  font-family: var(--font-display);
+}
+
+.page-header .instructions {
+  color: var(--mid);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.6rem;
+  color: var(--paper);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(232, 79, 43, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--mid);
+  opacity: 0.6;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Form containers */
+.maintenance-form,
+.payment-form,
+.walkthrough-form {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.maintenance-form h2,
+.payment-form h2,
+.walkthrough-form h2 {
+  font-size: 1.4rem;
+  margin: 0 0 1.5rem 0;
+  color: var(--paper);
+  font-family: var(--font-display);
+}
+
+/* Maintenance Requests */
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.request-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.request-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(232, 79, 43, 0.1);
+}
+
+.request-card h3 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--paper);
+}
+
+.request-card > p {
+  color: var(--mid);
+  margin: 0.5rem 0 1rem 0;
+  font-size: 0.95rem;
+}
+
+.request-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.request-meta span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.priority-low {
+  background: rgba(154, 166, 178, 0.1);
+  color: #9aa6b2;
+}
+
+.priority-medium {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.priority-high {
+  background: var(--late-bg);
+  color: var(--late);
+}
+
+.status-open {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.status-completed {
+  background: var(--paid-bg);
+  color: var(--paid);
+}
+
+.status-pending {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.date {
+  color: var(--mid);
+  font-size: 0.85rem;
+}
+
+/* Payment Page Styles */
+.rent-info-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rent-info-card h2 {
+  font-size: 1.2rem;
+  margin: 0 0 1rem 0;
+  color: var(--paper);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  color: var(--mid);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.info-row .value {
+  color: var(--paper);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.amount-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.amount-input-wrapper .currency {
+  padding: 0.85rem 1rem;
+  color: var(--mid);
+  font-size: 1rem;
+  font-weight: 600;
+  border-right: 1px solid var(--border);
+}
+
+.amount-input-wrapper input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+}
+
+.amount-input-wrapper input:focus {
+  outline: none;
+}
+
+.hint {
+  color: var(--mid);
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.payment-methods-info {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.method-info h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--paper);
+}
+
+.method-info p {
+  color: var(--mid);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.payment-already-made {
+  background: var(--card-bg);
+  border: 2px solid var(--paid);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.success-badge {
+  display: inline-block;
+  background: var(--paid-bg);
+  color: var(--paid);
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.payment-info {
+  background: var(--bg-raised);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  color: var(--mid);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+}
+
+.info-item .value {
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.payment-success {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.success-content {
+  background: var(--card-bg);
+  border: 2px solid var(--paid);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 600px;
+}
+
+.success-content h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+  color: var(--paid);
+}
+
+.success-content p {
+  color: var(--mid);
+  margin: 0.75rem 0;
+  font-size: 1rem;
+}
+
+.redirect-message {
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* Move-in Walkthrough */
+.progress-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--bg-raised);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #ff6b4a);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: var(--mid);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+.upload-area {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .upload-area {
+    grid-template-columns: 1fr;
+  }
+}
+
+.upload-box {
+  position: relative;
+}
+
+.upload-box input[type="file"] {
+  display: none;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background: var(--bg-raised);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-height: 200px;
+}
+
+.upload-label:hover {
+  border-color: var(--accent);
+  background: rgba(232, 79, 43, 0.05);
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.upload-text {
+  color: var(--paper);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-hint {
+  color: var(--mid);
+  font-size: 0.85rem;
+  display: block;
+}
+
+.upload-tips {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.upload-tips h3 {
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+  color: var(--paper);
+}
+
+.upload-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.upload-tips li {
+  padding: 0.5rem 0;
+  color: var(--mid);
+  font-size: 0.9rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.upload-tips li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.room-status {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.room-status h3 {
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  color: var(--paper);
+}
+
+.room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.room-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.room-item:hover {
+  border-color: var(--accent);
+  background: rgba(232, 79, 43, 0.05);
+}
+
+.room-status-icon {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.room-name {
+  flex: 1;
+  color: var(--paper);
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.completed {
+  background: var(--paid-bg);
+  color: var(--paid);
+}
+
+.status-badge.pending {
+  background: var(--pending-bg);
+  color: var(--pending);
+}
+
+.walkthrough-completed {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.completion-content {
+  background: var(--card-bg);
+  border: 2px solid var(--paid);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 600px;
+}
+
+.completion-content h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+  color: var(--paid);
+}
+
+.completion-content p {
+  color: var(--mid);
+  margin: 0.75rem 0;
+  font-size: 1rem;
+}
+
+.security-notice {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.security-notice h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--paper);
+}
+
+.security-notice p {
+  color: var(--mid);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.payment-security {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--mid);
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-raised);
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--mid);
+}
+
+.error-message {
+  background: var(--late-bg);
+  color: var(--late);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--late);
+}
+
+.btn-large {
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+  background: #d43a1a;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tenant-maintenance-page,
+  .pay-rent-page,
+  .move-in-walkthrough-page {
+    padding: 1.5rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .maintenance-form,
+  .payment-form,
+  .walkthrough-form {
+    padding: 1.5rem;
+  }
+
+  .rent-info-card {
+    padding: 1rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.form-row.column {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+label.field-label {
+  display: block;
+  color: var(--mid);
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--paper);
+  font-family: var(--font-body);
+}
+
+textarea { min-height: 120px; resize: vertical; }
+
+.file-input {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.list-item {
+  padding: 1rem;
+  border-radius: 6px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.list-item .meta {
+  color: var(--mid);
+  font-size: 0.85rem;
+}
+
+.actions-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  justify-content: flex-end;
+}
+
+/* Small screens */
+@media (max-width: 600px) {
+  .form-row { flex-direction: column; }
+  .actions-row { justify-content: stretch; }
+}
+

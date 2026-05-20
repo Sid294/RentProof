@@ -67,6 +67,23 @@ async def get_tenant(email: str) -> Optional[Dict[str, Any]]:
         return None
     except Exception as e:
         logger.error(f"Failed to get tenant {email}: {str(e)}")
+        # Fallback to local .data/tenants.json for development
+        try:
+            from pathlib import Path
+            base = Path(__file__).resolve().parents[1]
+            local_file = base / '.data' / 'tenants.json'
+            if not local_file.exists():
+                # also try repo root .data
+                local_file = base.parent / '.data' / 'tenants.json'
+            if local_file.exists():
+                with open(local_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                tenant = data.get(email)
+                if tenant:
+                    logger.info(f"Tenant {email} loaded from local data")
+                    return tenant
+        except Exception as e2:
+            logger.error(f"Failed to read local tenants.json: {str(e2)}")
         return None
 
 async def update_tenant(email: str, updates: Dict[str, Any]) -> bool:
@@ -146,6 +163,42 @@ async def get_payments(tenant_email: str) -> List[Dict[str, Any]]:
     except Exception as e:
         logger.error(f"Failed to get payments for {tenant_email}: {str(e)}")
         return []
+
+async def get_tenant_by_name(name: str) -> Optional[Dict[str, Any]]:
+    """Search for tenant by name in Firestore"""
+    try:
+        db = get_db()
+        # Query for tenants with matching name
+        query = db.collection("tenants").where("name", "==", name).limit(1)
+        docs = query.stream()
+        for doc in docs:
+            data = doc.to_dict()
+            data["id"] = doc.id
+            logger.info(f"Tenant {name} retrieved from Firestore")
+            return data
+        logger.warning(f"Tenant {name} not found in Firestore")
+        return None
+    except Exception as e:
+        logger.error(f"Failed to get tenant {name}: {str(e)}")
+        # Fallback to local tenants.json
+        try:
+            from pathlib import Path
+            base = Path(__file__).resolve().parents[1]
+            local_file = base / '.data' / 'tenants.json'
+            if not local_file.exists():
+                local_file = base.parent / '.data' / 'tenants.json'
+            if local_file.exists():
+                with open(local_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                # search by name value
+                for k, v in data.items():
+                    if v.get('name') == name:
+                        v['id'] = k
+                        logger.info(f"Tenant {name} loaded from local data")
+                        return v
+        except Exception as e2:
+            logger.error(f"Failed to read local tenants.json: {str(e2)}")
+        return None
 
 # Walkthrough operations
 async def save_walkthrough(tenant_email: str, walkthrough_data: Dict[str, Any]) -> bool:

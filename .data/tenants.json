@@ -1,0 +1,26 @@
+{
+  "test123@gmail.com": {
+    "id": "test123@gmail.com",
+    "name": "Test Tenant",
+    "email": "test123@gmail.com",
+    "property_id": "prop_test",
+    "property_address": "100 Test Street, Testville, TX 75000",
+    "unit_id": "unit_test",
+    "unit_number": "1A",
+    "rent_amount": 1800,
+    "due_date": 1,
+    "status": "occupied"
+  },
+  "atharv.ranjan@example.com": {
+    "id": "atharv.ranjan@example.com",
+    "name": "Atharv Ranjan",
+    "email": "atharv.ranjan@example.com",
+    "property_id": "prop_001",
+    "property_address": "456 Oak Avenue, San Francisco, CA 94103",
+    "unit_id": "unit_456",
+    "unit_number": "B2",
+    "rent_amount": 3200,
+    "due_date": 1,
+    "status": "occupied"
+  }
+}
